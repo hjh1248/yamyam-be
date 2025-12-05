@@ -20,13 +20,6 @@ public class FoodService {
 
     public List<SearchFoodServiceResponse> searchFood(String name) {
 
-        List<Food> results = foodRepository.findByNameLike(name);
-
-        Food food = results.get(0);
-
-        log.debug("name = {}", food.getName());
-        log.debug("result size = {}", results.size());
-
         return foodRepository.findByNameLike(name)
                 .stream()
                 .map(this::toSearchFoodServiceResponse)
