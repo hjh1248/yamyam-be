@@ -37,3 +37,7 @@ out/
 .vscode/
 
 application.yaml
+compose.yaml
+ddl.sql
+foods_dump.sql
+mysql_data

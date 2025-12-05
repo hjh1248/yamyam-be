@@ -10,30 +10,31 @@ public class Food {
     private Long id;
     private String name;
     private String category;
-    private Double weight;          // 중량(g)
-    private Double calorie;         // 칼로리(kcal)
-    private Double protein;         // 단백질(g)
-    private Double fat;             // 지방(g)
-    private Double carbohydrate;    // 탄수화물(g)
-    private Double sugar;           // 당(g)
-    private Double sodium;          // 나트륨(mg)
-    private Double cholesterol;     // 콜레스테롤(mg)
-    private Double saturatedFat;    // 포화지방(g)
-    private Double transFat;        // 트랜스지방 (g)
+    private BaseUnit baseUnit;
+
+    private Double energyPer100;        // 에너지(kcal/100단위)
+    private Double proteinPer100;       // 단백질(g/100단위)
+    private Double fatPer100;           // 지방(g/100단위)
+    private Double carbohydratePer100;  // 탄수화물(g/100단위)
+    private Double sugarPer100;         // 당(g/100단위)
+    private Double sodiumPer100;        // 나트륨(mg/100단위)
+    private Double cholesterolPer100;   // 콜레스테롤(mg/100단위)
+    private Double saturatedFatPer100;  // 포화지방(g/100단위)
+    private Double transFatPer100;      // 트랜스지방(g/100단위)
 
     @Builder
-    private Food(String name, String category, Double weight, Double calorie, Double protein, Double fat, Double carbohydrate, Double sugar, Double sodium, Double cholesterol, Double saturatedFat, Double transFat) {
+    private Food(String name, String category, BaseUnit baseUnit, Double energyPer100, Double proteinPer100, Double fatPer100, Double carbohydratePer100, Double sugarPer100, Double sodiumPer100, Double cholesterolPer100, Double saturatedFatPer100, Double transFatPer100) {
         this.name = name;
         this.category = category;
-        this.weight = weight;
-        this.calorie = calorie;
-        this.protein = protein;
-        this.fat = fat;
-        this.carbohydrate = carbohydrate;
-        this.sugar = sugar;
-        this.sodium = sodium;
-        this.cholesterol = cholesterol;
-        this.saturatedFat = saturatedFat;
-        this.transFat = transFat;
+        this.baseUnit = baseUnit;
+        this.energyPer100 = energyPer100;
+        this.proteinPer100 = proteinPer100;
+        this.fatPer100 = fatPer100;
+        this.carbohydratePer100 = carbohydratePer100;
+        this.sugarPer100 = sugarPer100;
+        this.sodiumPer100 = sodiumPer100;
+        this.cholesterolPer100 = cholesterolPer100;
+        this.saturatedFatPer100 = saturatedFatPer100;
+        this.transFatPer100 = transFatPer100;
     }
 }
