@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Repository
@@ -19,5 +20,10 @@ public class MyBatisFoodRepository implements FoodRepository {
     public List<Food> findByNameLike(String name) {
         log.debug("[MybatisFoodRepository.findByNameLike]: 검색 시작, name = {}", name);
         return foodMapper.findByNameLike(name);
+    }
+
+    @Override
+    public int countExistingIds(Set<Long> foodIds) {
+        return foodMapper.countExistingIds(foodIds);
     }
 }

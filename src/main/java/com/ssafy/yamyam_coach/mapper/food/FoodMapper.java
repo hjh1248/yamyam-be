@@ -5,10 +5,12 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface FoodMapper {
 
     List<Food> findByNameLike(String name);
 
+    int countExistingIds(@Param("foodIds") Set<Long> foodIds);
 }

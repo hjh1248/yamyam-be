@@ -1,7 +1,10 @@
 package com.ssafy.yamyam_coach.service.diet_plan;
 
+import com.ssafy.exception.diet_plan.DietPlanException;
+import com.ssafy.exception.diet_plan.ErrorCode;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
+import com.ssafy.yamyam_coach.service.daily_diet.DailyDietService;
 import com.ssafy.yamyam_coach.service.diet_plan.request.CreateDietPlanServiceRequest;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.ssafy.exception.diet_plan.ErrorCode.*;
 
 @Service
 @Slf4j
@@ -35,6 +40,13 @@ public class DietPlanService {
                 .stream()
                 .map(this::toDietPlanResponse)
                 .toList();
+    }
+
+    public DietPlanServiceResponse getDietPlanById(Long dietPlanId) {
+        DietPlan findDietPlan = dietPlanRepository.findById(dietPlanId)
+                .orElseThrow(() -> new DietPlanException(NOT_FOUND_DIET_PLAN));
+
+        return toDietPlanResponse(findDietPlan);
     }
 
     private Long getUserIdFromJwtToken() {

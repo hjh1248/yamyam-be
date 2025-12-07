@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.yamyam_coach.mapper.mealfood.MealFoodMapper">
+
+    <insert id="insert" useGeneratedKeys="true">
+        INSERT INTO meal_foods (meal_id, food_id, quantity)
+        VALUES (#{mealId}, #{foodId}, #{quantity})
+    </insert>
+
+    <insert id="batchInsert" useGeneratedKeys="true">
+        INSERT INTO meal_foods (meal_id, food_id, quantity)
+        VALUES
+        <foreach collection="mealFoods" item="mealFood" separator=",">
+            (
+                #{mealFood.mealId},
+                #{mealFood.foodId} ,
+                #{mealFood.quantity}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

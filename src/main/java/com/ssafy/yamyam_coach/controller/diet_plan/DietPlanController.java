@@ -1,6 +1,9 @@
 package com.ssafy.yamyam_coach.controller.diet_plan;
 
+import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDailyDietRequest;
 import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDietPlanRequest;
+import com.ssafy.yamyam_coach.service.daily_diet.DailyDietService;
+import com.ssafy.yamyam_coach.service.daily_diet.request.CreateDailyDietServiceRequest;
 import com.ssafy.yamyam_coach.service.diet_plan.DietPlanService;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
 import jakarta.validation.Valid;
@@ -20,6 +23,7 @@ import java.util.List;
 public class DietPlanController {
 
     private final DietPlanService dietPlanService;
+    private final DailyDietService dailyDietService;
 
     @PostMapping
     public ResponseEntity<Void> registerDietPlan(@RequestBody @Valid CreateDietPlanRequest request) {
@@ -34,13 +38,29 @@ public class DietPlanController {
                 .buildAndExpand(createdPlanId)
                 .toUri();
 
-        return ResponseEntity
-                .created(location)
-                .build();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/my")
     public ResponseEntity<List<DietPlanServiceResponse>> getMyDietPlans() {
         return ResponseEntity.ok(dietPlanService.getMyDietPlans());
+    }
+
+    @GetMapping("/{dietPlanId}")
+    public ResponseEntity<DietPlanServiceResponse> getDietPlanById(@PathVariable Long dietPlanId) {
+        return ResponseEntity.ok(dietPlanService.getDietPlanById(dietPlanId));
+    }
+
+    @PostMapping("/{dietPlanId}/daily-diets")
+    public ResponseEntity<Void> registerDailyDiet(@PathVariable Long dietPlanId, @RequestBody @Valid CreateDailyDietRequest request) {
+
+        log.debug("[DietPlanController.registerDailyDiet]: 특정 일 식단 등록 요청. request= {}", request);
+
+        CreateDailyDietServiceRequest serviceRequest = request.toServiceRequest();
+        serviceRequest.setDietPlanId(dietPlanId);
+
+        dailyDietService.registerDailyDiet(serviceRequest);
+
+        return ResponseEntity.status(201).build();
     }
 }

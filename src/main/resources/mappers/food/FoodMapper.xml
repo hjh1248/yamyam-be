@@ -25,4 +25,13 @@
         ORDER BY name
     </select>
 
+    <select id="countExistingIds" resultType="int">
+        SELECT COUNT(*)
+        FROM foods
+        WHERE id IN
+        <foreach collection="foodIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
 </mapper>
