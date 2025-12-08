@@ -33,4 +33,9 @@ public class MybatisDietPlanRepository implements DietPlanRepository {
     public boolean existsById(Long dietPlanId) {
         return dietPlanMapper.existsById(dietPlanId);
     }
+
+    @Override
+    public int deleteById(Long dietPlanId) {
+        return dietPlanMapper.deleteById(dietPlanId);
+    }
 }

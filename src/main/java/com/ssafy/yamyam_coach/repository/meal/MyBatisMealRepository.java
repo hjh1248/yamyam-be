@@ -22,4 +22,9 @@ public class MyBatisMealRepository implements MealRepository {
     public List<Meal> findByDailyDietId(Long dailyDietId) {
         return mealMapper.findByDailyDietId(dailyDietId);
     }
+
+    @Override
+    public int deleteByDailyDietId(Long dailyDietId) {
+        return mealMapper.deleteByDailyDietId(dailyDietId);
+    }
 }

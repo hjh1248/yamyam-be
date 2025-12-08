@@ -18,7 +18,8 @@
             <result property="type" column="m_type"/>
 
             <!-- MealFood 컬렉션 -->
-            <collection property="mealFoods" ofType="com.ssafy.yamyam_coach.repository.daily_diet.response.MealFoodDetail">
+            <collection property="mealFoods"
+                        ofType="com.ssafy.yamyam_coach.repository.daily_diet.response.MealFoodDetail">
                 <id property="id" column="mf_id"/>
                 <result property="quantity" column="mf_quantity"/>
 
@@ -96,4 +97,10 @@
         ORDER BY m.id, mf.id
     </select>
 
+
+    <update id="updateDescription">
+        UPDATE daily_diets
+        SET description = #{description}
+        WHERE id = #{dailyDietId}
+    </update>
 </mapper>

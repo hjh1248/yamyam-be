@@ -1,9 +1,9 @@
 package com.ssafy.yamyam_coach.controller.diet_plan;
 
-import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDailyDietRequest;
+import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateOrUpdateDailyDietRequest;
 import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDietPlanRequest;
 import com.ssafy.yamyam_coach.service.daily_diet.DailyDietService;
-import com.ssafy.yamyam_coach.service.daily_diet.request.CreateDailyDietServiceRequest;
+import com.ssafy.yamyam_coach.service.daily_diet.request.CreateOrUpdateDailyDietServiceRequest;
 import com.ssafy.yamyam_coach.service.diet_plan.DietPlanService;
 import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietDetailServiceResponse;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
@@ -53,12 +53,19 @@ public class DietPlanController {
         return ResponseEntity.ok(dietPlanService.getDietPlanById(dietPlanId));
     }
 
+    @DeleteMapping("/{dietPlanId}")
+    public ResponseEntity<Void> deleteDietPlan(@PathVariable Long dietPlanId) {
+        log.debug("[DietPlanController.deleteDietPlan]: 식단 삭제 요청. diet plan id = {}", dietPlanId);
+        dietPlanService.deleteById(dietPlanId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{dietPlanId}/daily-diets")
-    public ResponseEntity<Void> registerDailyDiet(@PathVariable Long dietPlanId, @RequestBody @Valid CreateDailyDietRequest request) {
+    public ResponseEntity<Void> registerDailyDiet(@PathVariable Long dietPlanId, @RequestBody @Valid CreateOrUpdateDailyDietRequest request) {
 
         log.debug("[DietPlanController.registerDailyDiet]: 특정 일 식단 등록 요청. request= {}", request);
 
-        CreateDailyDietServiceRequest serviceRequest = request.toServiceRequest();
+        CreateOrUpdateDailyDietServiceRequest serviceRequest = request.toServiceRequest();
         serviceRequest.setDietPlanId(dietPlanId);
 
         dailyDietService.registerDailyDiet(serviceRequest);
@@ -67,8 +74,21 @@ public class DietPlanController {
     }
 
     @GetMapping("/{dietPlanId}/daily-diets")
-    public ResponseEntity<DailyDietDetailServiceResponse> getDailyDietByIdAndDate(@PathVariable Long dietPlanId, @RequestParam LocalDate date) {
+    public ResponseEntity<DailyDietDetailServiceResponse> getDailyDietByDietPlanIdAndDate(@PathVariable Long dietPlanId, @RequestParam LocalDate date) {
         log.debug("[DietPlanController.getDailyDietByIdAndDate]: {}일 식단 조회 요청. diet plan id = {}", date, dietPlanId);
         return ResponseEntity.ok(dailyDietService.findByDietPlanIdAndDate(dietPlanId, date));
     }
+
+    @PatchMapping("/{dietPlanId}/daily-diets")
+    public ResponseEntity<Void> updateDailyDietByDietPlanIdAndDate(@PathVariable Long dietPlanId, @RequestBody @Valid CreateOrUpdateDailyDietRequest request) {
+        log.debug("[DietPlanController.updateDailyDietByDietPlanIdAndDate]: {}일 식단 업데이트 요청. diet plan id = {}", request, dietPlanId);
+
+        CreateOrUpdateDailyDietServiceRequest serviceRequest = request.toServiceRequest();
+        serviceRequest.setDietPlanId(dietPlanId);
+        dailyDietService.updateDailyDiet(serviceRequest);
+
+        return ResponseEntity.ok().build();
+    }
+
+
 }

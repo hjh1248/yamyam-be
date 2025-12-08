@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
-public class CreateMealFoodRequest {
+public class CreateOrUpdateMealFoodRequest {
 
     @NotNull(message = "음식 id 는 필수 입니다.")
     private Long foodId;

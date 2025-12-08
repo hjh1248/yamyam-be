@@ -31,6 +31,22 @@ public class DietPlanService {
         return createdDietPlan.getId();
     }
 
+    @Transactional
+    public void deleteById(Long dietPlanId) {
+        // 1. 존재 여부 검증
+        DietPlan dietPlan = dietPlanRepository.findById(dietPlanId)
+                .orElseThrow(() -> new DietPlanException(NOT_FOUND_DIET_PLAN));
+
+        // 2. 권한 검증 (본인 것만 삭제 가능)
+        Long currentUserId = getUserIdFromJwtToken();
+        if (!dietPlan.getUserId().equals(currentUserId)) {
+            throw new DietPlanException(UNAUTHORIZED);
+        }
+
+        // 3. 삭제
+        dietPlanRepository.deleteById(dietPlanId);
+    }
+
     public List<DietPlanServiceResponse> getMyDietPlans() {
         Long userId = getUserIdFromJwtToken();
 

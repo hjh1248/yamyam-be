@@ -17,8 +17,8 @@ import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
 import com.ssafy.yamyam_coach.repository.food.FoodRepository;
 import com.ssafy.yamyam_coach.repository.meal.MealRepository;
 import com.ssafy.yamyam_coach.repository.mealfood.MealFoodRepository;
-import com.ssafy.yamyam_coach.service.daily_diet.request.CreateDailyDietServiceRequest;
 import com.ssafy.yamyam_coach.service.daily_diet.request.CreateMealFoodServiceRequest;
+import com.ssafy.yamyam_coach.service.daily_diet.request.CreateOrUpdateDailyDietServiceRequest;
 import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietDetailServiceResponse;
 import com.ssafy.yamyam_coach.service.daily_diet.response.MealFoodDetailServiceResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class DailyDietService {
     private final MealFoodRepository mealFoodRepository;
 
     @Transactional
-    public void registerDailyDiet(CreateDailyDietServiceRequest request) {
+    public void registerDailyDiet(CreateOrUpdateDailyDietServiceRequest request) {
 
         log.debug("[DailyDietService.registerDailyDiet]: request = {}", request);
 
@@ -61,11 +61,11 @@ public class DailyDietService {
         // 2. 날짜 유효성 검증 (범위 및 중복 확인)
         validateDate(dietPlan, request.getDate());
 
-        log.debug("diet plan = {}" , dietPlan.getId());
+        log.debug("diet plan = {}", dietPlan.getId());
         log.debug("description = {}", request.getDescription());
 
         // 3. 요청된 모든 음식 ID 존재 여부 검증
-        validateFoodIds(request);
+        int foodCount = validateFoodIds(request);
 
         // 4. DailyDiet 생성 및 저장
         DailyDiet dailyDiet = DailyDiet.builder()
@@ -76,20 +76,42 @@ public class DailyDietService {
 
         dailyDietRepository.insert(dailyDiet);
 
-        // 5. 각 식사 타입별 Meal 및 MealFood 생성
-        List<MealFood> breakfastFoods = processMealType(request.getBreakfast(), BREAKFAST, dailyDiet.getId());
-        List<MealFood> lunchFoods = processMealType(request.getLunch(), LUNCH, dailyDiet.getId());
-        List<MealFood> dinnerFoods = processMealType(request.getDinner(), DINNER, dailyDiet.getId());
-        List<MealFood> snackFoods = processMealType(request.getSnack(), SNACK, dailyDiet.getId());
-
-        List<MealFood> mealFoods = Stream.of(breakfastFoods, lunchFoods, dinnerFoods, snackFoods)
-                .flatMap(List::stream)
-                .toList();
-
-        // 6. MealFood 일괄 저장
-        if (!mealFoods.isEmpty()) {
-            mealFoodRepository.batchInsert(mealFoods);
+        // 5. 요청 된 음식이 없을 경우 그냥 반환
+        if (isFoodsEmpty(foodCount)) {
+            return ;
         }
+
+        // 6. 각 식사 타입별 Meal 및 MealFood 생성
+        saveMealAndMealFoods(request, dailyDiet);
+    }
+
+    private static boolean isFoodsEmpty(int foodCount) {
+        return foodCount == 0;
+    }
+
+    @Transactional
+    public void updateDailyDiet(CreateOrUpdateDailyDietServiceRequest request) {
+        // 1. dietPlan 조회 및 존재검증
+        boolean isExists = dietPlanRepository.existsById(request.getDietPlanId());
+
+        if (!isExists) {
+            throw new DietPlanException(NOT_FOUND_DIET_PLAN);
+        }
+
+        // 2. daily diet 조회
+        DailyDiet dailyDiet = dailyDietRepository.findByDietPlanIdAndDate(request.getDietPlanId(), request.getDate())
+                .orElseThrow(() -> new DailyDietException(NOT_FOUND_DAILY_DIET));
+
+        // 3. description 변경사항 확인
+        if (!dailyDiet.getDescription().equals(request.getDescription())) {
+            dailyDietRepository.updateDescription(dailyDiet.getId(), request.getDescription());
+        }
+
+        // 3. daily diet 기반 meal 전체 삭제 -> cascade 되어 meal_food 도 자동 삭제됨
+        mealRepository.deleteByDailyDietId(dailyDiet.getId());
+
+        // 4. 새 meal 및 meal_food 모두 생성
+        saveMealAndMealFoods(request, dailyDiet);
     }
 
     public DailyDietDetailServiceResponse findByDietPlanIdAndDate(Long dietPlanId, LocalDate date) {
@@ -175,6 +197,21 @@ public class DailyDietService {
         return response;
     }
 
+    private void saveMealAndMealFoods(CreateOrUpdateDailyDietServiceRequest request, DailyDiet dailyDiet) {
+        List<MealFood> breakfastFoods = processMealType(request.getBreakfast(), BREAKFAST, dailyDiet.getId());
+        List<MealFood> lunchFoods = processMealType(request.getLunch(), LUNCH, dailyDiet.getId());
+        List<MealFood> dinnerFoods = processMealType(request.getDinner(), DINNER, dailyDiet.getId());
+        List<MealFood> snackFoods = processMealType(request.getSnack(), SNACK, dailyDiet.getId());
+
+        List<MealFood> mealFoods = Stream.of(breakfastFoods, lunchFoods, dinnerFoods, snackFoods)
+                .flatMap(List::stream)
+                .toList();
+
+        // 5. 새 meal_food , meal 저장
+        if (!mealFoods.isEmpty()) {
+            mealFoodRepository.batchInsert(mealFoods);
+        }
+    }
 
     private List<MealFood> processMealType(List<CreateMealFoodServiceRequest> foods, MealType mealType, Long dailyDietId) {
         if (foods == null || foods.isEmpty()) {
@@ -213,16 +250,25 @@ public class DailyDietService {
         }
     }
 
-    private void validateFoodIds(CreateDailyDietServiceRequest request) {
+    private int validateFoodIds(CreateOrUpdateDailyDietServiceRequest request) {
         Set<Long> foodIds = Stream.of(request.getBreakfast(), request.getLunch(), request.getDinner(), request.getSnack())
                 .flatMap(List::stream)
                 .map(CreateMealFoodServiceRequest::getFoodId)
                 .collect(Collectors.toSet());
 
+        log.debug("foodIds: {}", foodIds);
+
+        if (foodIds.isEmpty()) {
+            return 0;
+        }
+
         int existingCount = foodRepository.countExistingIds(foodIds);
         if (existingCount != foodIds.size()) {
             throw new FoodException(NOT_FOUND_FOOD);
         }
+
+        return existingCount;
     }
+
 
 }

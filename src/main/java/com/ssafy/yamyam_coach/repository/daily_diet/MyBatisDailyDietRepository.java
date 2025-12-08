@@ -26,8 +26,18 @@ public class MyBatisDailyDietRepository implements DailyDietRepository {
     }
 
     @Override
+    public Optional<DailyDiet> findByDietPlanIdAndDate(Long dietPlanId, LocalDate date) {
+        return Optional.ofNullable(dailyDietMapper.findByDietPlanIdAndDate(dietPlanId, date));
+    }
+
+    @Override
     public Optional<DailyDietDetail> findDetailByDietPlanIdAndDate(Long dietPlanId, LocalDate date) {
         return Optional.ofNullable(dailyDietMapper.findDetailByDietPlanIdAndDate(dietPlanId, date));
+    }
+
+    @Override
+    public int updateDescription(Long dailyDietId, String description) {
+        return dailyDietMapper.updateDescription(dailyDietId, description);
     }
 
 }

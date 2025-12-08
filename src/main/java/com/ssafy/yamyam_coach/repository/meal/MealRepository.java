@@ -9,4 +9,6 @@ public interface MealRepository {
     int insert(Meal meal);
 
     List<Meal> findByDailyDietId(Long id);
+
+    int deleteByDailyDietId(Long dailyDietId);
 }

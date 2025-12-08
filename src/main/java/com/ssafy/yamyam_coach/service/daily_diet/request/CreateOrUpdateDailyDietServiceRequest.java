@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class CreateDailyDietServiceRequest {
+public class CreateOrUpdateDailyDietServiceRequest {
 
     private Long dietPlanId;
     private LocalDate date;
@@ -18,7 +18,7 @@ public class CreateDailyDietServiceRequest {
     private List<CreateMealFoodServiceRequest> snack;
 
     @Builder
-    private CreateDailyDietServiceRequest(Long dietPlanId, LocalDate date, String description, List<CreateMealFoodServiceRequest> breakfast, List<CreateMealFoodServiceRequest> lunch, List<CreateMealFoodServiceRequest> dinner, List<CreateMealFoodServiceRequest> snack) {
+    private CreateOrUpdateDailyDietServiceRequest(Long dietPlanId, LocalDate date, String description, List<CreateMealFoodServiceRequest> breakfast, List<CreateMealFoodServiceRequest> lunch, List<CreateMealFoodServiceRequest> dinner, List<CreateMealFoodServiceRequest> snack) {
         this.dietPlanId = dietPlanId;
         this.date = date;
         this.description = description;

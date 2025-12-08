@@ -12,5 +12,9 @@ public interface DailyDietRepository {
 
     boolean existsByDietPlanIdAndDate(Long dietPlanId, LocalDate date);
 
+    Optional<DailyDiet> findByDietPlanIdAndDate(Long dietPlanId, LocalDate date);
+
     Optional<DailyDietDetail> findDetailByDietPlanIdAndDate(Long dietPlanId, LocalDate date);
+
+    int updateDescription(Long dailyDietId, String description);
 }

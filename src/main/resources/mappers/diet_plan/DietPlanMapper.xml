@@ -29,4 +29,9 @@
         WHERE id = #{dietPlanId}
     </select>
 
+    <delete id="deleteById">
+        DELETE FROM diet_plans
+        WHERE id = #{dietPlanId}
+    </delete>
+
 </mapper>
