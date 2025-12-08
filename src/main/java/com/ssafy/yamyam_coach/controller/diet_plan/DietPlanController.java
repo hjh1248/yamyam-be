@@ -48,6 +48,11 @@ public class DietPlanController {
         return ResponseEntity.ok(dietPlanService.getMyDietPlans());
     }
 
+    @GetMapping("/my/primary")
+    public ResponseEntity<DietPlanServiceResponse> getPrimaryDietPlan() {
+        return ResponseEntity.ok(dietPlanService.getPrimaryDietPlan());
+    }
+
     @GetMapping("/{dietPlanId}")
     public ResponseEntity<DietPlanServiceResponse> getDietPlanById(@PathVariable Long dietPlanId) {
         return ResponseEntity.ok(dietPlanService.getDietPlanById(dietPlanId));
@@ -89,6 +94,5 @@ public class DietPlanController {
 
         return ResponseEntity.ok().build();
     }
-
 
 }

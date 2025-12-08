@@ -6,8 +6,8 @@
 <mapper namespace="com.ssafy.yamyam_coach.mapper.diet_plan.DietPlanMapper">
 
     <insert id="insert" parameterType="DietPlan" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO diet_plans(user_id, title, content, is_shared, start_date, end_date, created_at, updated_at)
-            VALUES (#{userId}, #{title}, #{content}, #{isShared}, #{startDate}, #{endDate}, #{createdAt}, #{updatedAt})
+        INSERT INTO diet_plans(user_id, title, content, is_shared, is_primary, start_date, end_date, created_at, updated_at)
+            VALUES (#{userId}, #{title}, #{content}, #{isShared},  #{isPrimary}, #{startDate}, #{endDate}, #{createdAt}, #{updatedAt})
     </insert>
 
     <select id="findDietPlansByUserId" resultType="DietPlan">
@@ -27,6 +27,12 @@
         SELECT COUNT(*) > 0
         FROM diet_plans
         WHERE id = #{dietPlanId}
+    </select>
+
+    <select id="findUsersPrimaryDietPlan" resultType="DietPlan">
+        SELECT *
+        FROM diet_plans
+        WHERE user_id = #{userId} and is_primary = 1;
     </select>
 
     <delete id="deleteById">

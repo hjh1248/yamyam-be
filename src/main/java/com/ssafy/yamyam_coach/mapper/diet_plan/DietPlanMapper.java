@@ -17,4 +17,6 @@ public interface DietPlanMapper {
     boolean existsById(Long dietPlanId);
 
     int deleteById(Long dietPlanId);
+
+    DietPlan findUsersPrimaryDietPlan(Long userId);
 }

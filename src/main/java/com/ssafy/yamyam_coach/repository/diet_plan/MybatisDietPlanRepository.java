@@ -38,4 +38,9 @@ public class MybatisDietPlanRepository implements DietPlanRepository {
     public int deleteById(Long dietPlanId) {
         return dietPlanMapper.deleteById(dietPlanId);
     }
+
+    @Override
+    public Optional<DietPlan> findUsersPrimaryDietPlan(Long userId) {
+        return Optional.ofNullable(dietPlanMapper.findUsersPrimaryDietPlan(userId));
+    }
 }
