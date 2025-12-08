@@ -85,10 +85,6 @@ public class DailyDietService {
         saveMealAndMealFoods(request, dailyDiet);
     }
 
-    private static boolean isFoodsEmpty(int foodCount) {
-        return foodCount == 0;
-    }
-
     @Transactional
     public void updateDailyDiet(CreateOrUpdateDailyDietServiceRequest request) {
         // 1. dietPlan 조회 및 존재검증
@@ -107,10 +103,10 @@ public class DailyDietService {
             dailyDietRepository.updateDescription(dailyDiet.getId(), request.getDescription());
         }
 
-        // 3. daily diet 기반 meal 전체 삭제 -> cascade 되어 meal_food 도 자동 삭제됨
+        // 4. daily diet 기반 meal 전체 삭제 -> cascade 되어 meal_food 도 자동 삭제됨
         mealRepository.deleteByDailyDietId(dailyDiet.getId());
 
-        // 4. 새 meal 및 meal_food 모두 생성
+        // 5. 새 meal 및 meal_food 모두 생성
         saveMealAndMealFoods(request, dailyDiet);
     }
 
@@ -270,5 +266,8 @@ public class DailyDietService {
         return existingCount;
     }
 
+    private static boolean isFoodsEmpty(int foodCount) {
+        return foodCount == 0;
+    }
 
 }
