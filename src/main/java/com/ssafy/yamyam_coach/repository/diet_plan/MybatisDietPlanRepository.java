@@ -43,4 +43,15 @@ public class MybatisDietPlanRepository implements DietPlanRepository {
     public Optional<DietPlan> findUsersPrimaryDietPlan(Long userId) {
         return Optional.ofNullable(dietPlanMapper.findUsersPrimaryDietPlan(userId));
     }
+
+    @Override
+    public int deActiveCurrentPrimaryDietPlan(Long userId) {
+        return dietPlanMapper.deActivateCurrentPrimaryDietPlan(userId);
+    }
+
+    @Override
+    public int activeCurrentPrimaryDietPlan(Long userId, Long dietPlanId) {
+        return dietPlanMapper.activateCurrentPrimaryDietPlan(userId, dietPlanId);
+    }
+
 }

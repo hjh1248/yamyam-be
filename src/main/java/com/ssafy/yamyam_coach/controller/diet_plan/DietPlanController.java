@@ -58,6 +58,13 @@ public class DietPlanController {
         return ResponseEntity.ok(dietPlanService.getDietPlanById(dietPlanId));
     }
 
+    @PatchMapping("/{dietPlanId}")
+    public ResponseEntity<Void> changePrimaryDietPlan(@PathVariable Long dietPlanId) {
+        log.debug("[DietPlanController.deleteDietPlan]: 대표 식단 변경 요청. target diet plan id = {}", dietPlanId);
+        dietPlanService.changePrimaryDietPlanTo(dietPlanId);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{dietPlanId}")
     public ResponseEntity<Void> deleteDietPlan(@PathVariable Long dietPlanId) {
         log.debug("[DietPlanController.deleteDietPlan]: 식단 삭제 요청. diet plan id = {}", dietPlanId);

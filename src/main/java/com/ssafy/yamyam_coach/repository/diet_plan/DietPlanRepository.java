@@ -18,4 +18,8 @@ public interface DietPlanRepository {
     int deleteById(Long dietPlanId);
 
     Optional<DietPlan> findUsersPrimaryDietPlan(Long userId);
+
+    int deActiveCurrentPrimaryDietPlan(Long userId);
+
+    int activeCurrentPrimaryDietPlan(Long userId, Long dietPlanId);
 }

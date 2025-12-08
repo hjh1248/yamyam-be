@@ -49,6 +49,16 @@ public class DietPlanService {
         dietPlanRepository.deleteById(dietPlanId);
     }
 
+    @Transactional
+    public void changePrimaryDietPlanTo(Long targetId) {
+
+        // 1. 사용자 pk jwt token 에서 추출
+        Long userId = getUserIdFromJwtToken();
+
+        // 2. 대표 식단 변경
+        updatePrimaryDietPlan(userId, targetId);
+    }
+
     public List<DietPlanServiceResponse> getMyDietPlans() {
         Long userId = getUserIdFromJwtToken();
 
@@ -107,5 +117,14 @@ public class DietPlanService {
 
     private boolean isDietPlanEmpty(Long userId) {
         return dietPlanRepository.findDietPlansByUserId(userId).isEmpty();
+    }
+
+    private void updatePrimaryDietPlan(Long userId, Long newId) {
+        dietPlanRepository.deActiveCurrentPrimaryDietPlan(userId);
+        int updatedRows = dietPlanRepository.activeCurrentPrimaryDietPlan(userId, newId);
+
+        if (updatedRows == 0) {
+            throw new DietPlanException(NOT_FOUND_DIET_PLAN);
+        }
     }
 }
