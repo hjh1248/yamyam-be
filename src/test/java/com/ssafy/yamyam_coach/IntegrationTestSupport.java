@@ -3,6 +3,7 @@ package com.ssafy.yamyam_coach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -10,6 +11,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 public abstract class IntegrationTestSupport {
 
     @Container
@@ -19,7 +21,6 @@ public abstract class IntegrationTestSupport {
             .withUsername("root")
             .withPassword("1234")
             .withInitScript("schema.sql")
-            .withInitScript("init.sql")
             .withReuse(true);
 
 }

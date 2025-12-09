@@ -6,7 +6,7 @@ import com.ssafy.yamyam_coach.domain.user.User;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public abstract class DomainCreateHelper {
+public abstract class TestFixtures {
 
     public static User createUser(String name, String nickname, String email, String password) {
         return User.builder()
