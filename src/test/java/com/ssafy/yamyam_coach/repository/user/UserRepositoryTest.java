@@ -18,7 +18,7 @@ class UserRepositoryTest extends IntegrationTestSupport {
 
     @DisplayName("사용자를 저장할 수 있다.")
     @Test
-    void insert() {
+    void save() {
 
         //given
         User user = createUser("test user", "test nickname", "test@email.com", "password");
