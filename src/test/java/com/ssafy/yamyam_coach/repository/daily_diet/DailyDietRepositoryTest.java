@@ -48,7 +48,7 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
     void insert() {
         //given
         User user = createDummyUser();
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);
@@ -69,7 +69,7 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
     void existsByDietPlanIdAndDate() {
         //given
         User user = createDummyUser();
-        userRepository.insert(user);
+        userRepository.save(user);
 
         LocalDate startDate = LocalDate.of(2020, 1, 1);
         LocalDate endDate = startDate.plusDays(2);
@@ -93,7 +93,7 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
     void findByDietPlanIdAndDate() {
         //given
         User user = createDummyUser();
-        userRepository.insert(user);
+        userRepository.save(user);
 
         LocalDate startDate = LocalDate.of(2020, 1, 1);
         LocalDate endDate = startDate.plusDays(2);
@@ -119,7 +119,7 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
 
         // 1. User 생성
         User user = createDummyUser();
-        userRepository.insert(user);
+        userRepository.save(user);
 
         // 2. DietPlan 생성
         LocalDate startDate = LocalDate.of(2025, 1, 1);
@@ -167,7 +167,7 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
     void updateDescription() {
         //given
         User user = createDummyUser();
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);

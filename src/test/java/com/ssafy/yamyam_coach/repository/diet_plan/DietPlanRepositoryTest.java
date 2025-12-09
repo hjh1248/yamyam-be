@@ -28,7 +28,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
     void insert() {
         // given
         User user = createUser("test user", "test nickname", "test@email.com", "password");
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);
@@ -52,7 +52,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
 
         // given
         User user = createUser("test user", "test nickname", "test@email.com", "password");
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan1 = createDietPlan(user.getId(), "titile", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
         DietPlan dietPlan2 = createDietPlan(user.getId(), "titile2", "content2", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
@@ -74,7 +74,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
     void existsById() {
         // given
         User user = createUser("test user", "test nickname", "test@email.com", "password");
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);
@@ -93,7 +93,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
     void deleteById() {
         // given
         User user = createUser("test user", "test nickname", "test@email.com", "password");
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);
@@ -111,7 +111,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
     void findUsersPrimaryDietPlan() {
         // given
         User user = createUser("test user", "test nickname", "test@email.com", "password");
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan1 = createDietPlan(user.getId(), "titile", "content", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
         DietPlan dietPlan2 = createDietPlan(user.getId(), "titile2", "content2", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
@@ -138,7 +138,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
     void deActivateCurrentPrimaryDietPlan() {
         // given
         User user = createUser("test user", "test nickname", "test@email.com", "password");
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
 
@@ -157,7 +157,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
     void activateCurrentPrimaryDietPlan() {
         // given
         User user = createUser("test user", "test nickname", "test@email.com", "password");
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
 

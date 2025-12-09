@@ -20,6 +20,11 @@ public class MyBatisUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findById(Long userId) {
+        return Optional.ofNullable(userMapper.findById(userId));
+    }
+
+    @Override
     public Optional<User> findByEmail(String email) {
         // 매퍼 결과를 Optional로 안전하게 감싸서 리턴 (팀 스타일)
         return userMapper.findByEmail(email); 

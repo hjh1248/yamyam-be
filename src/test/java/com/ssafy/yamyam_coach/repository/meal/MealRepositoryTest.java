@@ -38,7 +38,7 @@ class MealRepositoryTest extends IntegrationTestSupport {
     void insert() {
         //given
         User user = createDummyUser();
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);
@@ -61,7 +61,7 @@ class MealRepositoryTest extends IntegrationTestSupport {
     @Test
     void deleteByDailyDietId() {
         User user = createDummyUser();
-        userRepository.insert(user);
+        userRepository.save(user);
 
         DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);

@@ -22,7 +22,7 @@ class UserRepositoryTest extends IntegrationTestSupport {
 
         //given
         User user = createUser("test user", "test nickname", "test@email.com", "password");
-        userRepository.insert(user);
+        userRepository.save(user);
 
         //when
         Optional<User> findUserOpt = userRepository.findById(user.getId());
