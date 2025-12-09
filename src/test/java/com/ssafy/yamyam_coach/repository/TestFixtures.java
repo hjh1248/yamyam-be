@@ -1,8 +1,12 @@
 package com.ssafy.yamyam_coach.repository;
 
+import com.ssafy.yamyam_coach.domain.daily_diet.DailyDiet;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.food.BaseUnit;
 import com.ssafy.yamyam_coach.domain.food.Food;
+import com.ssafy.yamyam_coach.domain.mealfood.MealFood;
+import com.ssafy.yamyam_coach.domain.meals.Meal;
+import com.ssafy.yamyam_coach.domain.meals.MealType;
 import com.ssafy.yamyam_coach.domain.user.User;
 
 import java.time.LocalDate;
@@ -22,6 +26,10 @@ public abstract class TestFixtures {
                 .build();
     }
 
+    public static User createDummyUser() {
+        return createUser("홍길동", "길동이", "test@example.com", "password123");
+    }
+
     public static DietPlan createDietPlan(Long userId, String title, String content, boolean isShared, boolean isPrimary, LocalDate startDate, LocalDate endDate) {
         return DietPlan.builder()
                 .userId(userId)
@@ -33,6 +41,41 @@ public abstract class TestFixtures {
                 .endDate(endDate)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static DietPlan createDummyDietPlan(Long userId, LocalDate startDate, LocalDate endDate) {
+        return createDietPlan(
+                userId,
+                "다이어트 식단",
+                "건강한 다이어트를 위한 식단 계획",
+                false,
+                true,
+                startDate,
+                endDate
+        );
+    }
+
+    public static DailyDiet createDailyDiet(Long dietPlanId, LocalDate date, String description) {
+        return DailyDiet.builder()
+                .dietPlanId(dietPlanId)
+                .date(date)
+                .description(description)
+                .build();
+    }
+
+    public static Meal createMeal(Long dailyDietId, MealType type) {
+        return Meal.builder()
+                .dailyDietId(dailyDietId)
+                .type(type)
+                .build();
+    }
+
+    public static MealFood createMealFood(Long mealId, Long foodId, Double quantity) {
+        return MealFood.builder()
+                .mealId(mealId)
+                .foodId(foodId)
+                .quantity(quantity)
                 .build();
     }
 
