@@ -185,7 +185,7 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
         assertThat(updatedDailyDiet.getDescription()).isEqualTo(nextDescription);
     }
 
-    @DisplayName("diet plan id 로 daily diet 들을 조회할 수 있다.")
+    @DisplayName("diet plan id 로 날짜순으로 정렬된 daily diet 들을 조회할 수 있다.")
     @Test
     void findByDietPlanId() {
         // given
@@ -209,8 +209,9 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
 
         //then
         assertThat(dailyDiets).hasSize(3)
-                .extracting(DailyDiet::getId)
-                .containsExactlyInAnyOrder(dailyDiet1.getId(), dailyDiet2.getId(), dailyDiet3.getId());
+                .extracting(DailyDiet::getDate)
+                .containsExactly(dailyDiet1.getDate(), dailyDiet2.getDate(), dailyDiet3.getDate())
+                .isSortedAccordingTo(LocalDate::compareTo);
 
     }
 

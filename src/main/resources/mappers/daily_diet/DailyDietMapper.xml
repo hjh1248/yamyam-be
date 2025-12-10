@@ -73,6 +73,7 @@
         SELECT *
         FROM daily_diets
         WHERE diet_plan_id = #{dietPlanId}
+        ORDER BY date
     </select>
 
     <select id="findDetailByDietPlanIdAndDate" resultMap="dailyDietDetailMap">

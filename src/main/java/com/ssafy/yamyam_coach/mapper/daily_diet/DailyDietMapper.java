@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Mapper
 public interface DailyDietMapper {
@@ -22,4 +23,5 @@ public interface DailyDietMapper {
 
     int updateDescription(@Param("dailyDietId") Long dailyDietId, @Param("description") String description);
 
+    List<DailyDiet> findByDietPlan(Long dietPlanId);
 }

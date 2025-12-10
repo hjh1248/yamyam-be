@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -43,6 +44,11 @@ public class MyBatisDailyDietRepository implements DailyDietRepository {
     @Override
     public int updateDescription(Long dailyDietId, String description) {
         return dailyDietMapper.updateDescription(dailyDietId, description);
+    }
+
+    @Override
+    public List<DailyDiet> findByDietPlan(Long dietPlanId) {
+        return dailyDietMapper.findByDietPlan(dietPlanId);
     }
 
 }
