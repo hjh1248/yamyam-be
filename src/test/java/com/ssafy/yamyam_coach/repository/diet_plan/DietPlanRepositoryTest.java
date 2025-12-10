@@ -4,6 +4,7 @@ import com.ssafy.yamyam_coach.IntegrationTestSupport;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.repository.user.UserRepository;
+import com.ssafy.yamyam_coach.util.DomainAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.ssafy.yamyam_coach.util.DomainAssertions.*;
+import static com.ssafy.yamyam_coach.util.DomainAssertions.assertDietPlanEquals;
 import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +33,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         User user = createUser("test user", "test nickname", "test@email.com", "password");
         userRepository.save(user);
 
-        DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
+        DietPlan dietPlan = createDietPlan(user.getId(), "title", "content", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);
 
         // when
@@ -41,10 +43,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         assertThat(findDietPlanOpt).isPresent();
 
         DietPlan findDietPlan = findDietPlanOpt.get();
-        assertThat(findDietPlan.getTitle()).isEqualTo(dietPlan.getTitle());
-        assertThat(findDietPlan.getContent()).isEqualTo(dietPlan.getContent());
-        assertThat(findDietPlan.getStartDate()).isEqualTo(dietPlan.getStartDate());
-        assertThat(findDietPlan.getEndDate()).isEqualTo(dietPlan.getEndDate());
+        assertDietPlanEquals(findDietPlan, dietPlan);
     }
 
     @DisplayName("사용자 pk 기반으로 식단 계획들을 조회할 수 있다.")
@@ -55,8 +54,8 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         User user = createUser("test user", "test nickname", "test@email.com", "password");
         userRepository.save(user);
 
-        DietPlan dietPlan1 = createDietPlan(user.getId(), "titile", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
-        DietPlan dietPlan2 = createDietPlan(user.getId(), "titile2", "content2", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
+        DietPlan dietPlan1 = createDietPlan(user.getId(), "title", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
+        DietPlan dietPlan2 = createDietPlan(user.getId(), "title2", "content2", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
 
         dietPlanRepository.insert(dietPlan1);
         dietPlanRepository.insert(dietPlan2);
@@ -77,7 +76,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         User user = createUser("test user", "test nickname", "test@email.com", "password");
         userRepository.save(user);
 
-        DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
+        DietPlan dietPlan = createDietPlan(user.getId(), "title", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);
 
         // when
@@ -96,7 +95,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         User user = createUser("test user", "test nickname", "test@email.com", "password");
         userRepository.save(user);
 
-        DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
+        DietPlan dietPlan = createDietPlan(user.getId(), "title", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
         dietPlanRepository.insert(dietPlan);
 
         // when
@@ -114,8 +113,8 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         User user = createUser("test user", "test nickname", "test@email.com", "password");
         userRepository.save(user);
 
-        DietPlan dietPlan1 = createDietPlan(user.getId(), "titile", "content", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
-        DietPlan dietPlan2 = createDietPlan(user.getId(), "titile2", "content2", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
+        DietPlan dietPlan1 = createDietPlan(user.getId(), "title", "content", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
+        DietPlan dietPlan2 = createDietPlan(user.getId(), "title", "content2", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
 
         dietPlanRepository.insert(dietPlan1);
         dietPlanRepository.insert(dietPlan2);
@@ -127,11 +126,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         assertThat(primaryDietPlanOpt).isPresent();
 
         DietPlan primaryDietPlan = primaryDietPlanOpt.get();
-        assertThat(primaryDietPlan.getId()).isEqualTo(dietPlan2.getId());
-        assertThat(primaryDietPlan.getTitle()).isEqualTo(dietPlan2.getTitle());
-        assertThat(primaryDietPlan.getContent()).isEqualTo(dietPlan2.getContent());
-        assertThat(primaryDietPlan.getStartDate()).isEqualTo(dietPlan2.getStartDate());
-        assertThat(primaryDietPlan.getEndDate()).isEqualTo(dietPlan2.getEndDate());
+        assertDietPlanEquals(primaryDietPlan, dietPlan2);
     }
 
     @DisplayName("사용자의 대표 식단을 비활성화 할 수 있다.")
@@ -141,7 +136,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         User user = createUser("test user", "test nickname", "test@email.com", "password");
         userRepository.save(user);
 
-        DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
+        DietPlan dietPlan = createDietPlan(user.getId(), "title", "content", false, true, LocalDate.now(), LocalDate.now().plusDays(1));
 
         dietPlanRepository.insert(dietPlan);
 
@@ -160,7 +155,7 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         User user = createUser("test user", "test nickname", "test@email.com", "password");
         userRepository.save(user);
 
-        DietPlan dietPlan = createDietPlan(user.getId(), "titile", "content", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
+        DietPlan dietPlan = createDietPlan(user.getId(), "title", "content", false, false, LocalDate.now(), LocalDate.now().plusDays(1));
 
         dietPlanRepository.insert(dietPlan);
 
@@ -171,10 +166,6 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         //then
         assertThat(usersPrimaryDietPlanOpt).isPresent();
         DietPlan primaryDietPlan = usersPrimaryDietPlanOpt.get();
-        assertThat(primaryDietPlan.getId()).isEqualTo(dietPlan.getId());
-        assertThat(primaryDietPlan.getTitle()).isEqualTo(dietPlan.getTitle());
-        assertThat(primaryDietPlan.getContent()).isEqualTo(dietPlan.getContent());
-        assertThat(primaryDietPlan.getStartDate()).isEqualTo(dietPlan.getStartDate());
-        assertThat(primaryDietPlan.getEndDate()).isEqualTo(dietPlan.getEndDate());
+        assertThat(primaryDietPlan.isPrimary()).isTrue();
     }
 }

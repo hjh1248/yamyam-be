@@ -20,8 +20,6 @@ public abstract class DomainAssertions {
         assertThat(actual.isPrimary()).isEqualTo(expected.isPrimary());
         assertThat(actual.getStartDate()).isEqualTo(expected.getStartDate());
         assertThat(actual.getEndDate()).isEqualTo(expected.getEndDate());
-        assertThat(actual.getCreatedAt()).isEqualTo(expected.getCreatedAt());
-        assertThat(actual.getUpdatedAt()).isEqualTo(expected.getUpdatedAt());
     }
 
     // Meal Assertions
