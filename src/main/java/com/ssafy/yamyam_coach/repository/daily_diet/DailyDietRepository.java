@@ -24,4 +24,6 @@ public interface DailyDietRepository {
     List<DailyDiet> findByDietPlan(Long dietPlanId);
 
     int updateDate(Long dailyDietId, LocalDate newDate);
+
+    int deleteById(Long dailyDietId);
 }

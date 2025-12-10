@@ -26,4 +26,6 @@ public interface DailyDietMapper {
     List<DailyDiet> findByDietPlan(Long dietPlanId);
 
     int updateDate(Long dailyDietId, LocalDate newDate);
+
+    int deleteById(Long dailyDietId);
 }

@@ -116,4 +116,15 @@
         SET description = #{description}
         WHERE id = #{dailyDietId}
     </update>
+
+    <update id="updateDate">
+        UPDATE daily_diets
+        SET date = #{newDate}
+        WHERE id = #{dailyDietId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM daily_diets
+        WHERE id = #{dailyDietId}
+    </delete>
 </mapper>
