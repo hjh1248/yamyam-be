@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.ssafy.yamyam_coach.util.DomainAssertions.assertDailyDietEquals;
 import static com.ssafy.yamyam_coach.util.TestFixtures.*;
@@ -184,6 +185,33 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
         assertThat(updatedDailyDiet.getDescription()).isEqualTo(nextDescription);
     }
 
+    @DisplayName("diet plan id 로 daily diet 들을 조회할 수 있다.")
+    @Test
+    void findByDietPlanId() {
+        // given
+        User user = createDummyUser();
+        userRepository.save(user);
 
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+        dietPlanRepository.insert(dietPlan);
+
+        DailyDiet dailyDiet1 = createDailyDiet(dietPlan.getId(), LocalDate.now(), "description1");
+        dailyDietRepository.insert(dailyDiet1);
+
+        DailyDiet dailyDiet2 = createDailyDiet(dietPlan.getId(), LocalDate.now().plusDays(1), "description2");
+        dailyDietRepository.insert(dailyDiet2);
+
+        DailyDiet dailyDiet3 = createDailyDiet(dietPlan.getId(), LocalDate.now().plusDays(2), "description3");
+        dailyDietRepository.insert(dailyDiet3);
+
+        // when
+        List<DailyDiet> dailyDiets = dailyDietRepository.findByDietPlan(dietPlan.getId());
+
+        //then
+        assertThat(dailyDiets).hasSize(3)
+                .extracting(DailyDiet::getId)
+                .containsExactlyInAnyOrder(dailyDiet1.getId(), dailyDiet2.getId(), dailyDiet3.getId());
+
+    }
 
 }

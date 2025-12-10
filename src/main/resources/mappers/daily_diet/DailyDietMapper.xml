@@ -69,6 +69,12 @@
           and date = #{date}
     </select>
 
+    <select id="findByDietPlan" resultType="DailyDiet">
+        SELECT *
+        FROM daily_diets
+        WHERE diet_plan_id = #{dietPlanId}
+    </select>
+
     <select id="findDetailByDietPlanIdAndDate" resultMap="dailyDietDetailMap">
         SELECT dd.id                   as dd_id,
                dd.diet_plan_id         as dd_diet_plan_id,
