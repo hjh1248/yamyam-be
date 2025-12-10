@@ -20,7 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.ssafy.yamyam_coach.repository.TestFixtures.*;
+import static com.ssafy.yamyam_coach.util.DomainAssertions.*;
+import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MealFoodRepositoryTest extends IntegrationTestSupport {
@@ -112,13 +113,6 @@ class MealFoodRepositoryTest extends IntegrationTestSupport {
         assertMealFoodEquals(findMealFood1, mealFood1);
         assertMealFoodEquals(findMealFood2, mealFood2);
 
-    }
-
-    private void assertMealFoodEquals(MealFood actual, MealFood expected) {
-        assertThat(actual).isNotNull();
-        assertThat(actual.getMealId()).isEqualTo(expected.getMealId());
-        assertThat(actual.getFoodId()).isEqualTo(expected.getFoodId());
-        assertThat(actual.getQuantity()).isEqualTo(expected.getQuantity());
     }
 
 }

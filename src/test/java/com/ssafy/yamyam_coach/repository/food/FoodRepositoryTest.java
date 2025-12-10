@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.ssafy.yamyam_coach.repository.TestFixtures.*;
+import static com.ssafy.yamyam_coach.util.DomainAssertions.*;
+import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FoodRepositoryTest extends IntegrationTestSupport {
@@ -118,18 +119,4 @@ class FoodRepositoryTest extends IntegrationTestSupport {
         assertThat(count).isEqualTo(0);
     }
 
-    private void assertFoodEquals(Food actual, Food expected) {
-        assertThat(actual.getName()).isEqualTo(expected.getName());
-        assertThat(actual.getCategory()).isEqualTo(expected.getCategory());
-        assertThat(actual.getBaseUnit()).isEqualTo(expected.getBaseUnit());
-        assertThat(actual.getEnergyPer100()).isEqualTo(expected.getEnergyPer100());
-        assertThat(actual.getProteinPer100()).isEqualTo(expected.getProteinPer100());
-        assertThat(actual.getFatPer100()).isEqualTo(expected.getFatPer100());
-        assertThat(actual.getCarbohydratePer100()).isEqualTo(expected.getCarbohydratePer100());
-        assertThat(actual.getSugarPer100()).isEqualTo(expected.getSugarPer100());
-        assertThat(actual.getSodiumPer100()).isEqualTo(expected.getSodiumPer100());
-        assertThat(actual.getCholesterolPer100()).isEqualTo(expected.getCholesterolPer100());
-        assertThat(actual.getSaturatedFatPer100()).isEqualTo(expected.getSaturatedFatPer100());
-        assertThat(actual.getTransFatPer100()).isEqualTo(expected.getTransFatPer100());
-    }
 }

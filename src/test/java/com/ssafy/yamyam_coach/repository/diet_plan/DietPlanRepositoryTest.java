@@ -12,7 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.ssafy.yamyam_coach.repository.TestFixtures.*;
+import static com.ssafy.yamyam_coach.util.DomainAssertions.*;
+import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DietPlanRepositoryTest extends IntegrationTestSupport {

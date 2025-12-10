@@ -16,7 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static com.ssafy.yamyam_coach.repository.TestFixtures.*;
+import static com.ssafy.yamyam_coach.util.DomainAssertions.*;
+import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MealRepositoryTest extends IntegrationTestSupport {
@@ -95,10 +96,4 @@ class MealRepositoryTest extends IntegrationTestSupport {
         assertThat(dinnerOpt).isNotPresent();
         assertThat(snackOpt).isNotPresent();
     }
-
-    private void assertMealEquals(Meal actual, Meal expected) {
-        assertThat(actual.getDailyDietId()).isEqualTo(expected.getDailyDietId());
-        assertThat(actual.getType()).isEqualTo(expected.getType());
-    }
-
 }

@@ -20,7 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 
-import static com.ssafy.yamyam_coach.repository.TestFixtures.*;
+import static com.ssafy.yamyam_coach.util.DomainAssertions.assertDailyDietEquals;
+import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DailyDietRepositoryTest extends IntegrationTestSupport {
@@ -85,7 +86,6 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
 
         //then
         assertThat(isExists).isTrue();
-
     }
 
     @DisplayName("식단 계획 ID와 날짜로 일일 식단을 조회할 수 있다.")
@@ -182,13 +182,8 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
         //then
         assertThat(updatedDailyDiet).isNotNull();
         assertThat(updatedDailyDiet.getDescription()).isEqualTo(nextDescription);
-
     }
 
-    private void assertDailyDietEquals(DailyDiet actual, DailyDiet expected) {
-        assertThat(actual.getDietPlanId()).isEqualTo(expected.getDietPlanId());
-        assertThat(actual.getDate()).isEqualTo(expected.getDate());
-        assertThat(actual.getDescription()).isEqualTo(expected.getDescription());
-    }
+
 
 }

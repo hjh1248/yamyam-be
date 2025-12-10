@@ -2,13 +2,15 @@ package com.ssafy.yamyam_coach.repository.user;
 
 import com.ssafy.yamyam_coach.IntegrationTestSupport;
 import com.ssafy.yamyam_coach.domain.user.User;
+import com.ssafy.yamyam_coach.util.DomainAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 
-import static com.ssafy.yamyam_coach.repository.TestFixtures.*;
+import static com.ssafy.yamyam_coach.util.DomainAssertions.*;
+import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserRepositoryTest extends IntegrationTestSupport {
@@ -31,10 +33,7 @@ class UserRepositoryTest extends IntegrationTestSupport {
         assertThat(findUserOpt).isPresent();
 
         User findUser = findUserOpt.get();
-        assertThat(findUser.getName()).isEqualTo(user.getName());
-        assertThat(findUser.getNickname()).isEqualTo(user.getNickname());
-        assertThat(findUser.getEmail()).isEqualTo(user.getEmail());
-        assertThat(findUser.getPassword()).isEqualTo(user.getPassword());
+        assertUserEquals(findUser, user);
     }
 
 }

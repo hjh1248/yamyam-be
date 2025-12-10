@@ -1,4 +1,4 @@
-package com.ssafy.yamyam_coach.repository;
+package com.ssafy.yamyam_coach.util;
 
 import com.ssafy.yamyam_coach.domain.daily_diet.DailyDiet;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
