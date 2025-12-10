@@ -24,4 +24,6 @@ public interface DailyDietMapper {
     int updateDescription(@Param("dailyDietId") Long dailyDietId, @Param("description") String description);
 
     List<DailyDiet> findByDietPlan(Long dietPlanId);
+
+    int updateDate(Long dailyDietId, LocalDate newDate);
 }

@@ -22,4 +22,6 @@ public interface DailyDietRepository {
     int updateDescription(Long dailyDietId, String description);
 
     List<DailyDiet> findByDietPlan(Long dietPlanId);
+
+    int updateDate(Long dailyDietId, LocalDate newDate);
 }

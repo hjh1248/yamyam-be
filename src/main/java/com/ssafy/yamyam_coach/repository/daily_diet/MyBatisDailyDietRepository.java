@@ -51,4 +51,9 @@ public class MyBatisDailyDietRepository implements DailyDietRepository {
         return dailyDietMapper.findByDietPlan(dietPlanId);
     }
 
+    @Override
+    public int updateDate(Long dailyDietId, LocalDate newDate) {
+        return dailyDietMapper.updateDate(dailyDietId, newDate);
+    }
+
 }

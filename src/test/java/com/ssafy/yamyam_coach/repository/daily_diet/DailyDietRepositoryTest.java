@@ -215,4 +215,31 @@ class DailyDietRepositoryTest extends IntegrationTestSupport {
 
     }
 
+    @DisplayName("daily diet 의 날짜를 업데이트 할 수 있다.")
+    @Test
+    void updateDate() {
+
+        // given
+
+        LocalDate before = LocalDate.now();
+        LocalDate after = LocalDate.now().plusDays(1);
+
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), before, after);
+        dietPlanRepository.insert(dietPlan);
+
+        DailyDiet dailyDiet = createDailyDiet(dietPlan.getId(), after,"description1");
+        dailyDietRepository.insert(dailyDiet);
+
+        // when
+        dailyDietRepository.updateDate(dailyDiet.getId(), after);
+        DailyDiet findDailyDiet = dailyDietRepository.findById(dailyDiet.getId()).orElse(null);
+
+        //then
+        assertThat(findDailyDiet).isNotNull();
+        assertThat(findDailyDiet.getDate()).isEqualTo(after);
+    }
+
 }
