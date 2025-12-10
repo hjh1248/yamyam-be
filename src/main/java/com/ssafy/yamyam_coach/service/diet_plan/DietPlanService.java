@@ -24,23 +24,22 @@ public class DietPlanService {
     private final DietPlanRepository dietPlanRepository;
 
     @Transactional
-    public Long registerDietPlan(CreateDietPlanServiceRequest request) {
-        boolean isPrimary = isDietPlanEmpty(getUserIdFromJwtToken());
+    public Long registerDietPlan(Long currentUserId, CreateDietPlanServiceRequest request) {
+        boolean isPrimary = isDietPlanEmpty(currentUserId);
 
-        DietPlan createdDietPlan = createDietPlan(request, getUserIdFromJwtToken(), isPrimary);
+        DietPlan createdDietPlan = createDietPlan(request, currentUserId, isPrimary);
         dietPlanRepository.insert(createdDietPlan);
 
         return createdDietPlan.getId();
     }
 
     @Transactional
-    public void deleteById(Long dietPlanId) {
+    public void deleteById(Long currentUserId, Long dietPlanId) {
         // 1. 존재 여부 검증
         DietPlan dietPlan = dietPlanRepository.findById(dietPlanId)
                 .orElseThrow(() -> new DietPlanException(NOT_FOUND_DIET_PLAN));
 
         // 2. 권한 검증 (본인 것만 삭제 가능)
-        Long currentUserId = getUserIdFromJwtToken();
         if (!dietPlan.getUserId().equals(currentUserId)) {
             throw new DietPlanException(UNAUTHORIZED);
         }
@@ -50,19 +49,12 @@ public class DietPlanService {
     }
 
     @Transactional
-    public void changePrimaryDietPlanTo(Long targetId) {
-
-        // 1. 사용자 pk jwt token 에서 추출
-        Long userId = getUserIdFromJwtToken();
-
-        // 2. 대표 식단 변경
-        updatePrimaryDietPlan(userId, targetId);
+    public void changePrimaryDietPlanTo(Long currentUserId, Long targetId) {
+        updatePrimaryDietPlan(currentUserId, targetId);
     }
 
-    public List<DietPlanServiceResponse> getMyDietPlans() {
-        Long userId = getUserIdFromJwtToken();
-
-        return dietPlanRepository.findDietPlansByUserId(userId)
+    public List<DietPlanServiceResponse> getMyDietPlans(Long currentUserId) {
+        return dietPlanRepository.findDietPlansByUserId(currentUserId)
                 .stream()
                 .map(this::toDietPlanResponse)
                 .toList();
@@ -75,19 +67,11 @@ public class DietPlanService {
         return toDietPlanResponse(findDietPlan);
     }
 
-    public DietPlanServiceResponse getPrimaryDietPlan() {
-        Long userId = getUserIdFromJwtToken();
-        DietPlan primaryDietPlan = dietPlanRepository.findUsersPrimaryDietPlan(userId)
-                .orElseThrow(() -> new DietPlanException(NOT_FOUND_DIET_PLAN));
+    public DietPlanServiceResponse getPrimaryDietPlan(Long currentUserId) {
+        DietPlan primaryDietPlan = dietPlanRepository.findUsersPrimaryDietPlan(currentUserId)
+                .orElseThrow(() -> new DietPlanException(NOT_FOUND_PRIMARY_DIET_PLAN));
 
         return toDietPlanResponse(primaryDietPlan);
-    }
-
-    private Long getUserIdFromJwtToken() {
-        /**
-         * todo jwt token 에서 userId 들고오는 로직 작성 해야함
-         */
-        return 1L;
     }
 
     private DietPlan createDietPlan(CreateDietPlanServiceRequest request, Long userId, boolean isPrimary) {
@@ -124,7 +108,7 @@ public class DietPlanService {
         int updatedRows = dietPlanRepository.activateCurrentPrimaryDietPlan(userId, newId);
 
         if (updatedRows == 0) {
-            throw new DietPlanException(NOT_FOUND_DIET_PLAN);
+            throw new DietPlanException(CANNOT_SET_AS_PRIMARY);
         }
     }
 }

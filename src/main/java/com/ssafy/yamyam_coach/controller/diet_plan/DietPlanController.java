@@ -31,7 +31,9 @@ public class DietPlanController {
     public ResponseEntity<Void> registerDietPlan(@RequestBody @Valid CreateDietPlanRequest request) {
 
         log.debug("[DietPlanController.registerDietPlan]: diet plan 생성 요청: {}", request);
-        Long createdPlanId = dietPlanService.registerDietPlan(request.toServiceRequest());
+
+        /** todo 추후 jwt 에서 꺼내오도록 변경 예정 */
+        Long createdPlanId = dietPlanService.registerDietPlan(1L, request.toServiceRequest());
 
         log.debug("[DietPlanController.registerDietPlan]: diet plan 생성완료! id: {}", createdPlanId);
         URI location = ServletUriComponentsBuilder
@@ -45,12 +47,12 @@ public class DietPlanController {
 
     @GetMapping("/my")
     public ResponseEntity<List<DietPlanServiceResponse>> getMyDietPlans() {
-        return ResponseEntity.ok(dietPlanService.getMyDietPlans());
+        return ResponseEntity.ok(dietPlanService.getMyDietPlans(1L));
     }
 
     @GetMapping("/my/primary")
     public ResponseEntity<DietPlanServiceResponse> getPrimaryDietPlan() {
-        return ResponseEntity.ok(dietPlanService.getPrimaryDietPlan());
+        return ResponseEntity.ok(dietPlanService.getPrimaryDietPlan(1L));
     }
 
     @GetMapping("/{dietPlanId}")
@@ -61,14 +63,14 @@ public class DietPlanController {
     @PatchMapping("/{dietPlanId}")
     public ResponseEntity<Void> changePrimaryDietPlan(@PathVariable Long dietPlanId) {
         log.debug("[DietPlanController.deleteDietPlan]: 대표 식단 변경 요청. target diet plan id = {}", dietPlanId);
-        dietPlanService.changePrimaryDietPlanTo(dietPlanId);
+        dietPlanService.changePrimaryDietPlanTo(1L, dietPlanId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{dietPlanId}")
     public ResponseEntity<Void> deleteDietPlan(@PathVariable Long dietPlanId) {
         log.debug("[DietPlanController.deleteDietPlan]: 식단 삭제 요청. diet plan id = {}", dietPlanId);
-        dietPlanService.deleteById(dietPlanId);
+        dietPlanService.deleteById(1L, dietPlanId);
         return ResponseEntity.noContent().build();
     }
 
