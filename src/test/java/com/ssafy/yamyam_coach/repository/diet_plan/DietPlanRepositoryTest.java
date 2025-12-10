@@ -4,7 +4,6 @@ import com.ssafy.yamyam_coach.IntegrationTestSupport;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.repository.user.UserRepository;
-import com.ssafy.yamyam_coach.util.DomainAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.ssafy.yamyam_coach.util.DomainAssertions.*;
 import static com.ssafy.yamyam_coach.util.DomainAssertions.assertDietPlanEquals;
 import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
