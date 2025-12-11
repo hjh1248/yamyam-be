@@ -1,6 +1,7 @@
 package com.ssafy.yamyam_coach.mapper.daily_diet;
 
 import com.ssafy.yamyam_coach.domain.daily_diet.DailyDiet;
+import com.ssafy.yamyam_coach.repository.daily_diet.request.DailyDietUpdateRequest;
 import com.ssafy.yamyam_coach.repository.daily_diet.response.DailyDietDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -21,11 +22,9 @@ public interface DailyDietMapper {
 
     DailyDietDetail findDetailByDietPlanIdAndDate(Long dietPlanId, LocalDate date);
 
-    int updateDescription(@Param("dailyDietId") Long dailyDietId, @Param("description") String description);
-
     List<DailyDiet> findByDietPlan(Long dietPlanId);
 
-    int updateDate(Long dailyDietId, LocalDate newDate);
+    int updateDailyDiet(@Param("dailyDietId") Long dailyDietId, @Param("date") LocalDate date, @Param("description") String description);
 
     int deleteById(Long dailyDietId);
 }

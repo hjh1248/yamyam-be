@@ -1,6 +1,7 @@
 package com.ssafy.yamyam_coach.repository.daily_diet;
 
 import com.ssafy.yamyam_coach.domain.daily_diet.DailyDiet;
+import com.ssafy.yamyam_coach.repository.daily_diet.request.DailyDietUpdateRequest;
 import com.ssafy.yamyam_coach.repository.daily_diet.response.DailyDietDetail;
 
 import java.time.LocalDate;
@@ -19,11 +20,9 @@ public interface DailyDietRepository {
 
     Optional<DailyDietDetail> findDetailByDietPlanIdAndDate(Long dietPlanId, LocalDate date);
 
-    int updateDescription(Long dailyDietId, String description);
+    int updateDailyDiet(DailyDietUpdateRequest request);
 
     List<DailyDiet> findByDietPlan(Long dietPlanId);
-
-    int updateDate(Long dailyDietId, LocalDate newDate);
 
     int deleteById(Long dailyDietId);
 }

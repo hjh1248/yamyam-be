@@ -2,6 +2,7 @@ package com.ssafy.yamyam_coach.repository.daily_diet;
 
 import com.ssafy.yamyam_coach.domain.daily_diet.DailyDiet;
 import com.ssafy.yamyam_coach.mapper.daily_diet.DailyDietMapper;
+import com.ssafy.yamyam_coach.repository.daily_diet.request.DailyDietUpdateRequest;
 import com.ssafy.yamyam_coach.repository.daily_diet.response.DailyDietDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -42,18 +43,13 @@ public class MyBatisDailyDietRepository implements DailyDietRepository {
     }
 
     @Override
-    public int updateDescription(Long dailyDietId, String description) {
-        return dailyDietMapper.updateDescription(dailyDietId, description);
+    public int updateDailyDiet(DailyDietUpdateRequest request) {
+        return dailyDietMapper.updateDailyDiet(request.getDailyDietId(), request.getDate(), request.getDescription());
     }
 
     @Override
     public List<DailyDiet> findByDietPlan(Long dietPlanId) {
         return dailyDietMapper.findByDietPlan(dietPlanId);
-    }
-
-    @Override
-    public int updateDate(Long dailyDietId, LocalDate newDate) {
-        return dailyDietMapper.updateDate(dailyDietId, newDate);
     }
 
     @Override

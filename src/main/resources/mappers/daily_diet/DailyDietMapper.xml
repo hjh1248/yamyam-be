@@ -110,21 +110,24 @@
         ORDER BY m.id, mf.id
     </select>
 
-
-    <update id="updateDescription">
+    <update id="updateDailyDiet">
         UPDATE daily_diets
-        SET description = #{description}
-        WHERE id = #{dailyDietId}
-    </update>
+        <set>
+            <if test="date != null">
+                date = #{date},
+            </if>
 
-    <update id="updateDate">
-        UPDATE daily_diets
-        SET date = #{newDate}
+            <if test="description != null">
+                description = #{description},
+            </if>
+        </set>
+
         WHERE id = #{dailyDietId}
     </update>
 
     <delete id="deleteById">
-        DELETE FROM daily_diets
+        DELETE
+        FROM daily_diets
         WHERE id = #{dailyDietId}
     </delete>
 </mapper>
