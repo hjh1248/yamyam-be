@@ -1,9 +1,9 @@
-package com.ssafy.yamyam_coach.exception.food;
+package com.ssafy.yamyam_coach.exception.meal;
 
 import com.ssafy.yamyam_coach.exception.common.exception.CustomException;
 
-public class FoodException extends CustomException {
-    public FoodException(ErrorCode errorCode) {
+public class MealException extends CustomException {
+    public MealException(ErrorCode errorCode) {
         super(errorCode);
     }
 }
