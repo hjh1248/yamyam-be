@@ -149,6 +149,64 @@ class MealRepositoryTest extends IntegrationTestSupport {
                 assertThat(isExists).isFalse();
             }
         }
+    }
+
+    @Nested
+    @DisplayName("findByDailyDietAndMealType")
+    class FindByDailyDietAndMealType {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        class SuccessCase {
+
+            @DisplayName("daily diet id 와 meal type 을 통해 meal 을 조회할 수 있다.")
+            @Test
+            void findByDailyDietAndMealType() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+                dietPlanRepository.insert(dietPlan);
+
+                DailyDiet dailyDiet = createDailyDiet(dietPlan.getId(), LocalDate.now(), "description");
+                dailyDietRepository.insert(dailyDiet);
+
+                Meal breakfast = createMeal(dailyDiet.getId(), MealType.BREAKFAST);
+                mealRepository.insert(breakfast);
+
+                // when
+                Meal findBreakfast = mealRepository.findByDailyDietAndMealType(dailyDiet.getId(), MealType.BREAKFAST).orElse(null);
+
+                // then
+                assertThat(findBreakfast).isNotNull();
+                assertMealEquals(findBreakfast, breakfast);
+
+            }
+
+            @DisplayName("해당 meal type 이 없을 경우 빈 optional 이 반환된다.")
+            @Test
+            void returnEmptyOptional() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+                dietPlanRepository.insert(dietPlan);
+
+                DailyDiet dailyDiet = createDailyDiet(dietPlan.getId(), LocalDate.now(), "description");
+                dailyDietRepository.insert(dailyDiet);
+
+
+
+                // when
+                Meal findBreakfast = mealRepository.findByDailyDietAndMealType(dailyDiet.getId(), MealType.BREAKFAST).orElse(null);
+
+                // then
+                assertThat(findBreakfast).isNull();
+            }
+        }
+
 
     }
 }
