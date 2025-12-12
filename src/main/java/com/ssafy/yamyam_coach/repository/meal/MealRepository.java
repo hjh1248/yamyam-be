@@ -15,4 +15,6 @@ public interface MealRepository {
     int deleteByDailyDietId(Long dailyDietId);
 
     boolean existsByDailyDietAndMealType(Long dailyDietId, MealType mealType);
+
+    Optional<Meal> findByDailyDietAndMealType(Long dailyDietId, MealType mealType);
 }

@@ -17,14 +17,23 @@
     </select>
 
     <delete id="deleteByDailyDietId">
-        DELETE FROM meals
+        DELETE
+        FROM meals
         WHERE daily_diet_id = #{dailyDietId}
     </delete>
 
     <select id="existsByDailyDietAndMealType" resultType="boolean">
         SELECT COUNT(*) > 0
         FROM meals
-        WHERE daily_diet_id = #{dailyDietId} and type = #{mealType}
+        WHERE daily_diet_id = #{dailyDietId}
+          and type = #{mealType}
+    </select>
+
+    <select id="findByDailyDietAndMealType" resultType="Meal">
+        SELECT *
+        FROM meals
+        WHERE daily_diet_id = #{dailyDietId}
+          and type = #{mealType}
     </select>
 
 </mapper>

@@ -34,4 +34,9 @@ public class MyBatisMealRepository implements MealRepository {
     public boolean existsByDailyDietAndMealType(Long dailyDietId, MealType mealType) {
         return mealMapper.existsByDailyDietAndMealType(dailyDietId, mealType);
     }
+
+    @Override
+    public Optional<Meal> findByDailyDietAndMealType(Long dailyDietId, MealType mealType) {
+        return Optional.ofNullable(mealMapper.findByDailyDietAndMealType(dailyDietId, mealType));
+    }
 }
