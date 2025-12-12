@@ -6,8 +6,8 @@ import com.ssafy.yamyam_coach.domain.mealfood.MealFood;
 import com.ssafy.yamyam_coach.domain.meals.Meal;
 import com.ssafy.yamyam_coach.domain.meals.MealType;
 import com.ssafy.yamyam_coach.exception.daily_diet.DailyDietException;
+import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
-import com.ssafy.yamyam_coach.exception.diet_plan.ErrorCode;
 import com.ssafy.yamyam_coach.exception.food.FoodException;
 import com.ssafy.yamyam_coach.exception.meal.MealException;
 import com.ssafy.yamyam_coach.repository.daily_diet.DailyDietRepository;
@@ -20,7 +20,8 @@ import com.ssafy.yamyam_coach.service.meal.request.CreateMealFoodServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.CreateMealServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.UpdateMealFoodServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.UpdateMealServiceRequest;
-import com.ssafy.yamyam_coach.service.meal.response.MealDetailServiceResponse;
+import com.ssafy.yamyam_coach.service.meal.response.MealDetailResponse;
+import com.ssafy.yamyam_coach.service.meal.response.MealFoodDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,11 +48,11 @@ public class MealService {
 
         // 1. dailyDiet 조회 및 존재 검증
         DailyDiet dailyDiet = dailyDietRepository.findById(request.getDailyDietId())
-                .orElseThrow(() -> new DailyDietException(com.ssafy.yamyam_coach.exception.daily_diet.ErrorCode.NOT_FOUND_DAILY_DIET));
+                .orElseThrow(() -> new DailyDietException(com.ssafy.yamyam_coach.exception.daily_diet.DailyDietErrorCode.NOT_FOUND_DAILY_DIET));
 
         // 2. dietPlan Id 조회
         DietPlan dietPlan = dietPlanRepository.findById(dailyDiet.getDietPlanId())
-                .orElseThrow(() -> new DietPlanException(ErrorCode.NOT_FOUND_DIET_PLAN));
+                .orElseThrow(() -> new DietPlanException(DietPlanErrorCode.NOT_FOUND_DIET_PLAN));
 
         // 3. dietPlan 의 소유자가 현재 요청자랑 동일한지 확인
         validateUser(currentUserId, dietPlan.getUserId());
@@ -84,15 +85,15 @@ public class MealService {
     public void updateMeal(Long currentUserId, UpdateMealServiceRequest request) {
         // 1.meal id 를 통해 meal 이 존재하는지 확인
         Meal meal = mealRepository.findById(request.getMealId())
-                .orElseThrow(() -> new MealException(com.ssafy.yamyam_coach.exception.meal.ErrorCode.NOT_FOUND_MEAL));
+                .orElseThrow(() -> new MealException(com.ssafy.yamyam_coach.exception.meal.MealErrorCode.NOT_FOUND_MEAL));
 
         // 2. meal 을 통해 daily diet 조회 및 존재 검증
         DailyDiet dailyDiet = dailyDietRepository.findById(meal.getDailyDietId())
-                .orElseThrow(() -> new DailyDietException(com.ssafy.yamyam_coach.exception.daily_diet.ErrorCode.NOT_FOUND_DAILY_DIET));
+                .orElseThrow(() -> new DailyDietException(com.ssafy.yamyam_coach.exception.daily_diet.DailyDietErrorCode.NOT_FOUND_DAILY_DIET));
 
         // 3. daily diet 를 통해 diet plan 조회 및 검증
         DietPlan dietPlan = dietPlanRepository.findById(dailyDiet.getDietPlanId())
-                .orElseThrow(() -> new DietPlanException(ErrorCode.NOT_FOUND_DIET_PLAN));
+                .orElseThrow(() -> new DietPlanException(DietPlanErrorCode.NOT_FOUND_DIET_PLAN));
 
         // 4. diet plan 의 user id 를 통한 현재 요청자와 diet plan 소유자가 동일한지 검증
         validateUser(currentUserId, dietPlan.getUserId());
@@ -102,7 +103,7 @@ public class MealService {
             Optional<Meal> mealOpt = mealRepository.findByDailyDietAndMealType(dailyDiet.getId(), request.getMealType());
 
             if (mealOpt.isPresent()) {
-                throw new MealException(com.ssafy.yamyam_coach.exception.meal.ErrorCode.DUPLICATED_MEAL_TYPE);
+                throw new MealException(com.ssafy.yamyam_coach.exception.meal.MealErrorCode.DUPLICATED_MEAL_TYPE);
             }
 
             mealRepository.updateMealType(meal.getId(), request.getMealType());
@@ -122,28 +123,33 @@ public class MealService {
         mealFoodRepository.batchInsert(mealFoods);
     }
 
-    public MealDetailServiceResponse getMealById(Long mealId) {
+    public MealDetailResponse getMealById(Long mealId) {
         // 1. meal 상세 정보 조회 (JOIN으로 meal_food + food 정보 포함)
         MealDetail mealDetail = mealRepository.findMealDetailById(mealId)
-                .orElseThrow(() -> new MealException(com.ssafy.yamyam_coach.exception.meal.ErrorCode.NOT_FOUND_MEAL));
+                .orElseThrow(() -> new MealException(com.ssafy.yamyam_coach.exception.meal.MealErrorCode.NOT_FOUND_MEAL));
 
         // 2. Service Response로 변환
-        return MealDetailServiceResponse.from(mealDetail);
+        return MealDetailResponse.builder()
+                .mealId(mealDetail.getId())
+                .mealType(mealDetail.getType())
+                .dailyDietId(mealDetail.getDailyDietId())
+                .mealFoods(mealDetail.getMealFoods().stream().map(MealFoodDetailResponse::from).toList())
+                .build();
     }
 
     @Transactional
     public void deleteMeal(Long currentUserId, Long mealId) {
         // 1.meal id 를 통해 meal 이 존재하는지 확인
         Meal meal = mealRepository.findById(mealId)
-                .orElseThrow(() -> new MealException(com.ssafy.yamyam_coach.exception.meal.ErrorCode.NOT_FOUND_MEAL));
+                .orElseThrow(() -> new MealException(com.ssafy.yamyam_coach.exception.meal.MealErrorCode.NOT_FOUND_MEAL));
 
         // 2. meal 을 통해 daily diet 조회 및 존재 검증
         DailyDiet dailyDiet = dailyDietRepository.findById(meal.getDailyDietId())
-                .orElseThrow(() -> new DailyDietException(com.ssafy.yamyam_coach.exception.daily_diet.ErrorCode.NOT_FOUND_DAILY_DIET));
+                .orElseThrow(() -> new DailyDietException(com.ssafy.yamyam_coach.exception.daily_diet.DailyDietErrorCode.NOT_FOUND_DAILY_DIET));
 
         // 3. daily diet 를 통해 diet plan 조회 및 검증
         DietPlan dietPlan = dietPlanRepository.findById(dailyDiet.getDietPlanId())
-                .orElseThrow(() -> new DietPlanException(ErrorCode.NOT_FOUND_DIET_PLAN));
+                .orElseThrow(() -> new DietPlanException(DietPlanErrorCode.NOT_FOUND_DIET_PLAN));
 
         // 4. diet plan 의 user id 를 통한 현재 요청자와 diet plan 소유자가 동일한지 검증
         validateUser(currentUserId, dietPlan.getUserId());
@@ -153,7 +159,7 @@ public class MealService {
 
         // 6. return 이 1 미만일 경우 예외
         if (deleteCount < 1) {
-            throw new MealException(com.ssafy.yamyam_coach.exception.meal.ErrorCode.NOT_FOUND_MEAL);
+            throw new MealException(com.ssafy.yamyam_coach.exception.meal.MealErrorCode.NOT_FOUND_MEAL);
         }
     }
 
@@ -165,7 +171,7 @@ public class MealService {
         int existingIds = foodRepository.countExistingIds(foodIds);
 
         if (foodIds.size() != existingIds) {
-            throw new FoodException(com.ssafy.yamyam_coach.exception.food.ErrorCode.NOT_FOUND_FOOD);
+            throw new FoodException(com.ssafy.yamyam_coach.exception.food.FoodErrorCode.NOT_FOUND_FOOD);
         }
     }
 
@@ -177,19 +183,19 @@ public class MealService {
         int existingIds = foodRepository.countExistingIds(foodIds);
 
         if (foodIds.size() != existingIds) {
-            throw new FoodException(com.ssafy.yamyam_coach.exception.food.ErrorCode.NOT_FOUND_FOOD);
+            throw new FoodException(com.ssafy.yamyam_coach.exception.food.FoodErrorCode.NOT_FOUND_FOOD);
         }
     }
 
     private void validateDuplicatedMealType(DailyDiet dailyDiet, MealType mealType) {
         if (mealRepository.existsByDailyDietAndMealType(dailyDiet.getId(), mealType)) {
-            throw new MealException(com.ssafy.yamyam_coach.exception.meal.ErrorCode.DUPLICATED_MEAL_TYPE);
+            throw new MealException(com.ssafy.yamyam_coach.exception.meal.MealErrorCode.DUPLICATED_MEAL_TYPE);
         }
     }
 
     private void validateUser(Long currentUserId, Long userId) {
         if (!currentUserId.equals(userId)) {
-            throw new MealException(com.ssafy.yamyam_coach.exception.meal.ErrorCode.UNAUTHORIZED);
+            throw new MealException(com.ssafy.yamyam_coach.exception.meal.MealErrorCode.UNAUTHORIZED);
         }
     }
 

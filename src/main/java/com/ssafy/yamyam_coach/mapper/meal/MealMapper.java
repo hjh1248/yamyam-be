@@ -2,6 +2,7 @@ package com.ssafy.yamyam_coach.mapper.meal;
 
 import com.ssafy.yamyam_coach.domain.meals.Meal;
 import com.ssafy.yamyam_coach.domain.meals.MealType;
+import com.ssafy.yamyam_coach.repository.meal.response.MealDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,4 +24,6 @@ public interface MealMapper {
     int deleteById(Long mealId);
 
     int updateMealType(Long mealId, MealType mealType);
+
+    MealDetail findMealDetailById(Long mealId);
 }

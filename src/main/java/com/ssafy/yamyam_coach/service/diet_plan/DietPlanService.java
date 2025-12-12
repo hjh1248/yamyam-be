@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.ssafy.yamyam_coach.exception.diet_plan.ErrorCode.*;
+import static com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode.*;
 
 @Service
 @Slf4j

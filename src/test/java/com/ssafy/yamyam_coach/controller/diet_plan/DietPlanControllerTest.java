@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import static com.ssafy.yamyam_coach.exception.diet_plan.ErrorCode.*;
+import static com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode.*;
 import static org.hamcrest.Matchers.endsWith;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;

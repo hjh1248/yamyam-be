@@ -33,8 +33,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.ssafy.yamyam_coach.domain.meals.MealType.*;
-import static com.ssafy.yamyam_coach.exception.daily_diet.ErrorCode.*;
-import static com.ssafy.yamyam_coach.exception.diet_plan.ErrorCode.NOT_FOUND_DIET_PLAN;
+import static com.ssafy.yamyam_coach.exception.daily_diet.DailyDietErrorCode.*;
+import static com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode.NOT_FOUND_DIET_PLAN;
 
 @Slf4j
 @Service

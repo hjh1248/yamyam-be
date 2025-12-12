@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import static com.ssafy.yamyam_coach.exception.daily_diet.ErrorCode.*;
+import static com.ssafy.yamyam_coach.exception.daily_diet.DailyDietErrorCode.*;
 import static org.hamcrest.Matchers.endsWith;
 
 import java.time.LocalDate;
@@ -328,7 +328,7 @@ class DailyDietControllerTest extends RestControllerTestSupport {
 
                 // stubbing
                 given(dailyDietService.getDailyDietByDietPlan(dietPlanId))
-                        .willThrow(new DietPlanException(com.ssafy.yamyam_coach.exception.diet_plan.ErrorCode.NOT_FOUND_DIET_PLAN));
+                        .willThrow(new DietPlanException(com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode.NOT_FOUND_DIET_PLAN));
 
                 // when then
                 mockMvc.perform(

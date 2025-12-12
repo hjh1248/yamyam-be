@@ -15,14 +15,15 @@ import com.ssafy.yamyam_coach.repository.daily_diet.DailyDietRepository;
 import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
 import com.ssafy.yamyam_coach.repository.food.FoodRepository;
 import com.ssafy.yamyam_coach.repository.meal.MealRepository;
+import com.ssafy.yamyam_coach.repository.meal.response.MealFoodDetail;
 import com.ssafy.yamyam_coach.repository.mealfood.MealFoodRepository;
 import com.ssafy.yamyam_coach.repository.user.UserRepository;
 import com.ssafy.yamyam_coach.service.meal.request.CreateMealFoodServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.CreateMealServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.UpdateMealFoodServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.UpdateMealServiceRequest;
-import com.ssafy.yamyam_coach.service.meal.response.MealDetailServiceResponse;
-import com.ssafy.yamyam_coach.service.meal.response.MealFoodDetailServiceResponse;
+import com.ssafy.yamyam_coach.service.meal.response.MealDetailResponse;
+import com.ssafy.yamyam_coach.service.meal.response.MealFoodDetailResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -567,9 +568,9 @@ class MealServiceTest extends IntegrationTestSupport {
         @DisplayName("성공 케이스")
         class SuccessCase {
 
+            @DisplayName("식사에 대한 상세 조회를 할 수 있다.")
             @Test
-            @DisplayName("meal id로 meal 상세 정보를 조회할 수 있다")
-            void getMealByIdSuccessfully() {
+            void getMealById() {
                 // given
                 User user = createDummyUser();
                 userRepository.save(user);
@@ -584,24 +585,28 @@ class MealServiceTest extends IntegrationTestSupport {
                 mealRepository.insert(breakfast);
 
                 Food food1 = createDummyFoodByName("닭가슴살");
-                Food food2 = createDummyFoodByName("현미밥");
                 foodRepository.insert(food1);
+
+                Food food2 = createDummyFoodByName("닭도리탕");
                 foodRepository.insert(food2);
 
-                MealFood mealFood1 = createMealFood(breakfast.getId(), food1.getId(), 200.0);
-                MealFood mealFood2 = createMealFood(breakfast.getId(), food2.getId(), 150.0);
-                mealFoodRepository.batchInsert(List.of(mealFood1, mealFood2));
+                MealFood mealFood1 = createMealFood(breakfast.getId(), food1.getId(), 100.0);
+                MealFood mealFood2 = createMealFood(breakfast.getId(), food2.getId(), 100.0);
+                mealFoodRepository.insert(mealFood1);
+                mealFoodRepository.insert(mealFood2);
 
                 // when
-                MealDetailServiceResponse response = mealService.getMealById(breakfast.getId());
+                MealDetailResponse response = mealService.getMealById(breakfast.getId());
 
                 // then
+                assertThat(response).isNotNull();
                 assertThat(response.getMealId()).isEqualTo(breakfast.getId());
-                assertThat(response.getMealType()).isEqualTo(MealType.BREAKFAST);
+                assertThat(response.getMealType()).isEqualTo(breakfast.getType());
                 assertThat(response.getDailyDietId()).isEqualTo(dailyDiet.getId());
                 assertThat(response.getMealFoods()).hasSize(2)
-                        .extracting(MealFoodDetailServiceResponse::getMealFoodId)
-                        .containsExactlyInAnyOrder(food1.getId(), food2.getId());
+                        .extracting(MealFoodDetailResponse::getMealFoodId)
+                        .containsExactlyInAnyOrder(mealFood1.getId(), mealFood2.getId());
+
             }
         }
 
@@ -609,19 +614,16 @@ class MealServiceTest extends IntegrationTestSupport {
         @DisplayName("실패 케이스")
         class FailureCase {
 
+            @DisplayName("식사가 없을 경우 NOT_FOUND_MEAL 예외가 발생한다.")
             @Test
-            @DisplayName("존재하지 않는 meal id로 조회 시 NOT_FOUND_MEAL 예외가 발생한다")
-            void getMealByIdWithNotExistingMealId() {
+            void test2() {
                 // given
-                User user = createDummyUser();
-                userRepository.save(user);
 
-                Long notExistingMealId = 99999L;
-
-                // when & then
-                assertThatThrownBy(() -> mealService.getMealById(notExistingMealId))
+                // when // then
+                assertThatThrownBy(() -> mealService.getMealById(99999L))
                         .isInstanceOf(MealException.class)
                         .hasMessage("해당 식사를 조회할 수 없습니다.");
+
             }
         }
     }

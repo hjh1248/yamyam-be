@@ -4,7 +4,7 @@ import com.ssafy.yamyam_coach.exception.common.exception.CustomException;
 
 public class DailyDietException extends CustomException {
 
-    public DailyDietException(ErrorCode errorCode) {
+    public DailyDietException(DailyDietErrorCode errorCode) {
         super(errorCode);
     }
 }

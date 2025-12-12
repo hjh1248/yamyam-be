@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class MealFoodDetailServiceResponse {
+public class MealFoodDetailResponse {
     private final Long mealFoodId;
     private final Double quantity;
     private final Long foodId;
@@ -19,7 +19,7 @@ public class MealFoodDetailServiceResponse {
     private final Double carbohydratePer100;
 
     @Builder
-    private MealFoodDetailServiceResponse(Long mealFoodId, Double quantity, Long foodId, String foodName,
+    private MealFoodDetailResponse(Long mealFoodId, Double quantity, Long foodId, String foodName,
                                           String category, BaseUnit baseUnit, Double energyPer100,
                                           Double proteinPer100, Double fatPer100, Double carbohydratePer100) {
         this.mealFoodId = mealFoodId;
@@ -34,8 +34,8 @@ public class MealFoodDetailServiceResponse {
         this.carbohydratePer100 = carbohydratePer100;
     }
 
-    public static MealFoodDetailServiceResponse from(MealFoodDetail mealFoodDetail) {
-        return MealFoodDetailServiceResponse.builder()
+    public static MealFoodDetailResponse from(MealFoodDetail mealFoodDetail) {
+        return MealFoodDetailResponse.builder()
                 .mealFoodId(mealFoodDetail.getId())
                 .quantity(mealFoodDetail.getQuantity())
                 .foodId(mealFoodDetail.getFood().getId())
