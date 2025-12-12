@@ -9,7 +9,6 @@ import com.ssafy.yamyam_coach.domain.meals.Meal;
 import com.ssafy.yamyam_coach.domain.meals.MealType;
 import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.exception.daily_diet.DailyDietException;
-import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
 import com.ssafy.yamyam_coach.exception.food.FoodException;
 import com.ssafy.yamyam_coach.exception.meal.MealException;
 import com.ssafy.yamyam_coach.repository.daily_diet.DailyDietRepository;
@@ -18,10 +17,12 @@ import com.ssafy.yamyam_coach.repository.food.FoodRepository;
 import com.ssafy.yamyam_coach.repository.meal.MealRepository;
 import com.ssafy.yamyam_coach.repository.mealfood.MealFoodRepository;
 import com.ssafy.yamyam_coach.repository.user.UserRepository;
-import com.ssafy.yamyam_coach.service.meal.request.CreateMealFoodRequest;
+import com.ssafy.yamyam_coach.service.meal.request.CreateMealFoodServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.CreateMealServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.UpdateMealFoodServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.UpdateMealServiceRequest;
+import com.ssafy.yamyam_coach.service.meal.response.MealDetailServiceResponse;
+import com.ssafy.yamyam_coach.service.meal.response.MealFoodDetailServiceResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,8 +32,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static com.ssafy.yamyam_coach.util.TestFixtures.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 class MealServiceTest extends IntegrationTestSupport {
 
@@ -83,13 +83,15 @@ class MealServiceTest extends IntegrationTestSupport {
                 foodRepository.insert(food1);
                 foodRepository.insert(food2);
 
-                CreateMealFoodRequest mealFood1 = new CreateMealFoodRequest();
-                mealFood1.setFoodId(food1.getId());
-                mealFood1.setAmount(200.0);
+                CreateMealFoodServiceRequest mealFood1 = CreateMealFoodServiceRequest.builder()
+                        .foodId(food1.getId())
+                        .amount(200.0)
+                        .build();
 
-                CreateMealFoodRequest mealFood2 = new CreateMealFoodRequest();
-                mealFood2.setFoodId(food2.getId());
-                mealFood2.setAmount(150.0);
+                CreateMealFoodServiceRequest mealFood2 = CreateMealFoodServiceRequest.builder()
+                        .foodId(food2.getId())
+                        .amount(200.0)
+                        .build();
 
                 CreateMealServiceRequest request = CreateMealServiceRequest.builder()
                         .dailyDietId(dailyDiet.getId())
@@ -207,9 +209,10 @@ class MealServiceTest extends IntegrationTestSupport {
 
                 Long notExistingFoodId = 99999L;
 
-                CreateMealFoodRequest mealFood = new CreateMealFoodRequest();
-                mealFood.setFoodId(notExistingFoodId);
-                mealFood.setAmount(200.0);
+                CreateMealFoodServiceRequest mealFood = CreateMealFoodServiceRequest.builder()
+                        .foodId(notExistingFoodId)
+                        .amount(200.0)
+                        .build();
 
                 CreateMealServiceRequest request = CreateMealServiceRequest.builder()
                         .dailyDietId(dailyDiet.getId())
@@ -261,18 +264,21 @@ class MealServiceTest extends IntegrationTestSupport {
                 foodRepository.insert(newFood1);
                 foodRepository.insert(newFood2);
 
-                UpdateMealFoodServiceRequest updateMealFood1 = new UpdateMealFoodServiceRequest();
-                updateMealFood1.setFoodId(newFood1.getId());
-                updateMealFood1.setAmount(150.0);
+                UpdateMealFoodServiceRequest updateMealFood1 = UpdateMealFoodServiceRequest.builder()
+                        .foodId(newFood1.getId())
+                        .amount(150.0)
+                        .build();
 
-                UpdateMealFoodServiceRequest updateMealFood2 = new UpdateMealFoodServiceRequest();
-                updateMealFood2.setFoodId(newFood2.getId());
-                updateMealFood2.setAmount(200.0);
+                UpdateMealFoodServiceRequest updateMealFood2 = UpdateMealFoodServiceRequest.builder()
+                        .foodId(newFood2.getId())
+                        .amount(200.0)
+                        .build();
 
-                UpdateMealServiceRequest request = new UpdateMealServiceRequest();
-                request.setMealId(breakfast.getId());
-                request.setMealType(MealType.LUNCH); // BREAKFAST → LUNCH 변경
-                request.setMealFoodUpdateRequests(List.of(updateMealFood1, updateMealFood2));
+                UpdateMealServiceRequest request = UpdateMealServiceRequest.builder()
+                        .mealId(breakfast.getId())
+                        .mealType(MealType.LUNCH)
+                        .mealFoodUpdateRequests(List.of(updateMealFood1, updateMealFood2))
+                        .build();
 
                 // when
                 mealService.updateMeal(user.getId(), request);
@@ -313,14 +319,16 @@ class MealServiceTest extends IntegrationTestSupport {
                 Food newFood = createDummyFoodByName("연어");
                 foodRepository.insert(newFood);
 
-                UpdateMealFoodServiceRequest updateMealFood = new UpdateMealFoodServiceRequest();
-                updateMealFood.setFoodId(newFood.getId());
-                updateMealFood.setAmount(150.0);
+                UpdateMealFoodServiceRequest updateMealFood = UpdateMealFoodServiceRequest.builder()
+                        .foodId(newFood.getId())
+                        .amount(150.0)
+                        .build();
 
-                UpdateMealServiceRequest request = new UpdateMealServiceRequest();
-                request.setMealId(breakfast.getId());
-                request.setMealType(MealType.BREAKFAST); // 그대로 BREAKFAST
-                request.setMealFoodUpdateRequests(List.of(updateMealFood));
+                UpdateMealServiceRequest request = UpdateMealServiceRequest.builder()
+                        .mealId(breakfast.getId())
+                        .mealType(MealType.BREAKFAST)
+                        .mealFoodUpdateRequests(List.of(updateMealFood))
+                        .build();
 
                 // when
                 mealService.updateMeal(user.getId(), request);
@@ -349,10 +357,11 @@ class MealServiceTest extends IntegrationTestSupport {
 
                 Long notExistingMealId = 99999L;
 
-                UpdateMealServiceRequest request = new UpdateMealServiceRequest();
-                request.setMealId(notExistingMealId);
-                request.setMealType(MealType.BREAKFAST);
-                request.setMealFoodUpdateRequests(List.of());
+                UpdateMealServiceRequest request = UpdateMealServiceRequest.builder()
+                        .mealId(notExistingMealId)
+                        .mealType(MealType.BREAKFAST)
+                        .mealFoodUpdateRequests(List.of())
+                        .build();
 
                 // when & then
                 assertThatThrownBy(() -> mealService.updateMeal(user.getId(), request))
@@ -379,10 +388,11 @@ class MealServiceTest extends IntegrationTestSupport {
                 Meal othersMeal = createMeal(othersDailyDiet.getId(), MealType.BREAKFAST);
                 mealRepository.insert(othersMeal);
 
-                UpdateMealServiceRequest request = new UpdateMealServiceRequest();
-                request.setMealId(othersMeal.getId());
-                request.setMealType(MealType.LUNCH);
-                request.setMealFoodUpdateRequests(List.of());
+                UpdateMealServiceRequest request = UpdateMealServiceRequest.builder()
+                        .mealId(othersMeal.getId())
+                        .mealType(MealType.LUNCH)
+                        .mealFoodUpdateRequests(List.of())
+                        .build();
 
                 // when & then
                 assertThatThrownBy(() -> mealService.updateMeal(user.getId(), request))
@@ -410,10 +420,11 @@ class MealServiceTest extends IntegrationTestSupport {
                 Meal lunch = createMeal(dailyDiet.getId(), MealType.LUNCH);
                 mealRepository.insert(lunch);
 
-                UpdateMealServiceRequest request = new UpdateMealServiceRequest();
-                request.setMealId(breakfast.getId());
-                request.setMealType(MealType.LUNCH); // BREAKFAST → LUNCH (이미 존재)
-                request.setMealFoodUpdateRequests(List.of());
+                UpdateMealServiceRequest request = UpdateMealServiceRequest.builder()
+                        .mealId(breakfast.getId())
+                        .mealType(MealType.LUNCH)
+                        .mealFoodUpdateRequests(List.of())
+                        .build();
 
                 // when & then
                 assertThatThrownBy(() -> mealService.updateMeal(user.getId(), request))
@@ -439,14 +450,17 @@ class MealServiceTest extends IntegrationTestSupport {
 
                 Long notExistingFoodId = 99999L;
 
-                UpdateMealFoodServiceRequest updateMealFood = new UpdateMealFoodServiceRequest();
-                updateMealFood.setFoodId(notExistingFoodId);
-                updateMealFood.setAmount(200.0);
 
-                UpdateMealServiceRequest request = new UpdateMealServiceRequest();
-                request.setMealId(breakfast.getId());
-                request.setMealType(MealType.BREAKFAST);
-                request.setMealFoodUpdateRequests(List.of(updateMealFood));
+                UpdateMealFoodServiceRequest updatedMealFood = UpdateMealFoodServiceRequest.builder()
+                        .foodId(notExistingFoodId)
+                        .amount(200.0)
+                        .build();
+
+                UpdateMealServiceRequest request = UpdateMealServiceRequest.builder()
+                        .mealId(breakfast.getId())
+                        .mealType(MealType.BREAKFAST)
+                        .mealFoodUpdateRequests(List.of(updatedMealFood))
+                        .build();
 
                 // when & then
                 assertThatThrownBy(() -> mealService.updateMeal(user.getId(), request))
@@ -541,6 +555,73 @@ class MealServiceTest extends IntegrationTestSupport {
                 assertThatThrownBy(() -> mealService.deleteMeal(user.getId(), othersMeal.getId()))
                         .isInstanceOf(MealException.class)
                         .hasMessage("식사를 생성할 권한이 없습니다.");
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("getMealById")
+    class GetMealById {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        class SuccessCase {
+
+            @Test
+            @DisplayName("meal id로 meal 상세 정보를 조회할 수 있다")
+            void getMealByIdSuccessfully() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(7));
+                dietPlanRepository.insert(dietPlan);
+
+                DailyDiet dailyDiet = createDailyDiet(dietPlan.getId(), LocalDate.now(), "오늘의 식단");
+                dailyDietRepository.insert(dailyDiet);
+
+                Meal breakfast = createMeal(dailyDiet.getId(), MealType.BREAKFAST);
+                mealRepository.insert(breakfast);
+
+                Food food1 = createDummyFoodByName("닭가슴살");
+                Food food2 = createDummyFoodByName("현미밥");
+                foodRepository.insert(food1);
+                foodRepository.insert(food2);
+
+                MealFood mealFood1 = createMealFood(breakfast.getId(), food1.getId(), 200.0);
+                MealFood mealFood2 = createMealFood(breakfast.getId(), food2.getId(), 150.0);
+                mealFoodRepository.batchInsert(List.of(mealFood1, mealFood2));
+
+                // when
+                MealDetailServiceResponse response = mealService.getMealById(breakfast.getId());
+
+                // then
+                assertThat(response.getMealId()).isEqualTo(breakfast.getId());
+                assertThat(response.getMealType()).isEqualTo(MealType.BREAKFAST);
+                assertThat(response.getDailyDietId()).isEqualTo(dailyDiet.getId());
+                assertThat(response.getMealFoods()).hasSize(2)
+                        .extracting(MealFoodDetailServiceResponse::getMealFoodId)
+                        .containsExactlyInAnyOrder(food1.getId(), food2.getId());
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        class FailureCase {
+
+            @Test
+            @DisplayName("존재하지 않는 meal id로 조회 시 NOT_FOUND_MEAL 예외가 발생한다")
+            void getMealByIdWithNotExistingMealId() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                Long notExistingMealId = 99999L;
+
+                // when & then
+                assertThatThrownBy(() -> mealService.getMealById(notExistingMealId))
+                        .isInstanceOf(MealException.class)
+                        .hasMessage("해당 식사를 조회할 수 없습니다.");
             }
         }
     }
