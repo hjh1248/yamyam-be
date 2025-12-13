@@ -2,7 +2,9 @@ package com.ssafy.yamyam_coach.service.daily_diet.response;
 
 import com.ssafy.yamyam_coach.domain.food.BaseUnit;
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 public class MealFoodDetailResponse {
 
     private Long foodId;

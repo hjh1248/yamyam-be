@@ -438,13 +438,8 @@ class DailyDietServiceTest extends IntegrationTestSupport {
                 // then
                 assertThat(response.getDayOfWeek()).isEqualTo(expectedDayOfWeek);
             }
-        }
 
-        @Nested
-        @DisplayName("실패 케이스")
-        class FailureCase {
-
-            @DisplayName("존재하지 않는 DailyDiet를 조회하면 NOT_FOUND_DAILY_DIET 예외가 발생한다.")
+            @DisplayName("존재하지 않는 DailyDiet를 빈 daily diet 가 반환된다.")
             @Test
             void dailyDietNotFound() {
                 // given
@@ -464,10 +459,18 @@ class DailyDietServiceTest extends IntegrationTestSupport {
                         .date(nonExistentDate)
                         .build();
 
+                DailyDietDetailResponse response = dailyDietService.getDailyDietDetailByDietPlan(request);
+
                 // then
-                assertThatThrownBy(() -> dailyDietService.getDailyDietDetailByDietPlan(request))
-                        .isInstanceOf(DailyDietException.class)
-                        .hasMessage("해당 일일 식단을 조회할 수 없습니다.");
+               assertThat(response).isNotNull();
+               assertThat(response.getDailyDietId()).isNull();
+               assertThat(response.getDate()).isEqualTo(nonExistentDate);
+               assertThat(response.getDayOfWeek()).isEqualTo(nonExistentDate.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN));
+               assertThat(response.getDescription()).isNull();
+               assertThat(response.getBreakfast()).isNull();
+               assertThat(response.getLunch()).isNull();
+               assertThat(response.getDinner()).isNull();
+               assertThat(response.getSnack()).isNull();
             }
         }
     }

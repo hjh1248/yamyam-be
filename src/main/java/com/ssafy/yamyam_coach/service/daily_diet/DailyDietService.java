@@ -92,27 +92,41 @@ public class DailyDietService {
     public DailyDietDetailResponse getDailyDietDetailByDietPlan(DailyDietDetailServiceRequest request) {
 
         // 1. diet plan 과 daily diet join 한 결과 불러오기
-        DailyDietDetail dailyDietDetail = dailyDietRepository.findDetailByDietPlanIdAndDate(request.getDietPlanId(), request.getDate())
-                .orElseThrow(() -> new DailyDietException(NOT_FOUND_DAILY_DIET));
+        Optional<DailyDietDetail> dailyDietDetailOpt = dailyDietRepository.findDetailByDietPlanIdAndDate(request.getDietPlanId(), request.getDate());
 
+        // 2. daily diet 가 없을 경우 빈 daily diet 반환
+        if (dailyDietDetailOpt.isEmpty()) {
+            return DailyDietDetailResponse.builder()
+                    .dailyDietId(null)
+                    .date(request.getDate())
+                    .dayOfWeek(request.getDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN))
+                    .description(null)
+                    .breakfast(null)
+                    .lunch(null)
+                    .dinner(null)
+                    .snack(null)
+                    .build();
+        }
 
-        // 2. 아침 점심 저녁 간식 별 식단의 음식 조회
+        DailyDietDetail dailyDietDetail = dailyDietDetailOpt.get();
+
+        // 3. 아침 점심 저녁 간식 별 식단의 음식 조회
         Map<MealType, MealDetail> mealDetailByType = dailyDietDetail.getMeals().stream()
                 .collect(Collectors.toMap(MealDetail::getType, Function.identity()));
 
-        // 3. 아침에 속한 meal food 들 조회
+        // 4. 아침에 속한 meal food 들 조회
         List<MealFoodDetailResponse> breakfastDetails = extractMealFoodDetailsByType(mealDetailByType, BREAKFAST);
 
-        // 4. 점심에 속한 meal food 들 조회
+        // 5. 점심에 속한 meal food 들 조회
         List<MealFoodDetailResponse> lunchDetails = extractMealFoodDetailsByType(mealDetailByType, LUNCH);
 
-        // 4. 저녁에 속한 meal food 들 조회
+        // 6. 저녁에 속한 meal food 들 조회
         List<MealFoodDetailResponse> dinnerDetails = extractMealFoodDetailsByType(mealDetailByType, DINNER);
 
-        // 5. 간식에 속한 meal food 들 조회
+        // 7. 간식에 속한 meal food 들 조회
         List<MealFoodDetailResponse> snackDetails = extractMealFoodDetailsByType(mealDetailByType, SNACK);
 
-        // 6. 결과 반환
+        // 8. 결과 반환
         return DailyDietDetailResponse.builder()
                 .dailyDietId(dailyDietDetail.getId())
                 .date(dailyDietDetail.getDate())
