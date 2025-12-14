@@ -65,8 +65,7 @@ public class MealController {
         UpdateMealServiceRequest serviceRequest = UpdateMealServiceRequest.builder()
                 .mealId(mealId)
                 .mealType(request.getMealType())
-                .mealFoodUpdateRequests(request.getMealFoodUpdateRequests() == null ? List.of()
-                        : request.getMealFoodUpdateRequests().stream().map(UpdateMealFoodRequest::toServiceRequest).toList())
+                .mealFoodUpdateRequests(request.getMealFoodUpdateRequests().stream().map(UpdateMealFoodRequest::toServiceRequest).toList())
                 .build();
 
         mealService.updateMeal(currentUserId, serviceRequest);

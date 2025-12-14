@@ -348,10 +348,14 @@ class DailyDietServiceTest extends IntegrationTestSupport {
                 assertThat(response.getDescription()).isEqualTo("고단백 식단");
 
 
-                assertThat(response.getBreakfast()).hasSize(1);
-                assertThat(response.getLunch()).hasSize(1);
-                assertThat(response.getDinner()).hasSize(1);
-                assertThat(response.getSnack()).hasSize(1);
+                assertThat(response.getBreakfast().getMealFoods()).hasSize(1);
+                assertThat(response.getBreakfast().getMealId()).isEqualTo(breakfast.getId());
+                assertThat(response.getLunch().getMealFoods()).hasSize(1);
+                assertThat(response.getLunch().getMealId()).isEqualTo(lunch.getId());
+                assertThat(response.getDinner().getMealFoods()).hasSize(1);
+                assertThat(response.getDinner().getMealId()).isEqualTo(dinner.getId());
+                assertThat(response.getSnack().getMealFoods()).hasSize(1);
+                assertThat(response.getSnack().getMealId()).isEqualTo(snack.getId());
             }
 
             @DisplayName("일부 식사만 있는 경우에도 정상적으로 조회되며 Null Pointer Exception이 발생하지 않는다.")
@@ -396,10 +400,14 @@ class DailyDietServiceTest extends IntegrationTestSupport {
 
                 // then
                 assertThat(response).isNotNull();
-                assertThat(response.getBreakfast()).hasSize(1);
-                assertThat(response.getLunch()).hasSize(1);
-                assertThat(response.getDinner()).isEmpty(); // 빈 리스트
-                assertThat(response.getSnack()).isEmpty(); // 빈 리스트
+                assertThat(response.getBreakfast().getMealFoods()).hasSize(1);
+                assertThat(response.getBreakfast().getMealId()).isEqualTo(breakfast.getId());
+                assertThat(response.getLunch().getMealFoods()).hasSize(1);
+                assertThat(response.getLunch().getMealId()).isEqualTo(lunch.getId());
+                assertThat(response.getDinner().getMealFoods()).isNull();
+                assertThat(response.getDinner().getMealId()).isNull();
+                assertThat(response.getSnack().getMealFoods()).isNull();
+                assertThat(response.getSnack().getMealId()).isNull();
             }
 
             @DisplayName("요일 정보가 올바르게 한글로 포함된다.")

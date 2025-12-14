@@ -14,13 +14,13 @@ public class DailyDietDetailResponse {
     private String dayOfWeek;
     private String description;
 
-    private List<MealFoodDetailResponse> breakfast;
-    private List<MealFoodDetailResponse> lunch;
-    private List<MealFoodDetailResponse> dinner;
-    private List<MealFoodDetailResponse> snack;
+    private MealDetailResponse breakfast;
+    private MealDetailResponse lunch;
+    private MealDetailResponse dinner;
+    private MealDetailResponse snack;
 
     @Builder
-    private DailyDietDetailResponse(Long dailyDietId, LocalDate date, String dayOfWeek, String description, List<MealFoodDetailResponse> breakfast, List<MealFoodDetailResponse> lunch, List<MealFoodDetailResponse> dinner, List<MealFoodDetailResponse> snack) {
+    private DailyDietDetailResponse(Long dailyDietId, LocalDate date, String dayOfWeek, String description, MealDetailResponse breakfast, MealDetailResponse lunch, MealDetailResponse dinner, MealDetailResponse snack) {
         this.dailyDietId = dailyDietId;
         this.date = date;
         this.dayOfWeek = dayOfWeek;

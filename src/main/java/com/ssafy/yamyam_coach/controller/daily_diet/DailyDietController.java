@@ -53,7 +53,7 @@ public class DailyDietController {
     @GetMapping("/{date}")
     public ResponseEntity<DailyDietDetailResponse> getDailyDietDetailByDietPlanAndDate(@PathVariable Long dietPlanId, @PathVariable LocalDate date) {
 
-        log.debug("[DailyDietController.getDailyDietDetailByDietPlanAndDate]: diet plan 에 속한 daily diet 요청! diet plan id = {}", dietPlanId);
+        log.debug("[DailyDietController.getDailyDietDetailByDietPlanAndDate]: diet plan 에 속한 daily diet 요청! diet plan id = {} date = {}", dietPlanId, date);
         DailyDietDetailServiceRequest request = DailyDietDetailServiceRequest.builder()
                 .dietPlanId(dietPlanId)
                 .date(date)

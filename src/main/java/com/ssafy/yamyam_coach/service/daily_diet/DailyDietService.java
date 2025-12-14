@@ -14,10 +14,7 @@ import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
 import com.ssafy.yamyam_coach.service.daily_diet.request.DailyDietDetailServiceRequest;
 import com.ssafy.yamyam_coach.service.daily_diet.request.DailyDietUpdateServiceRequest;
 import com.ssafy.yamyam_coach.service.daily_diet.request.RegisterDailyDietServiceRequest;
-import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietDetailResponse;
-import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietResponse;
-import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietsResponse;
-import com.ssafy.yamyam_coach.service.daily_diet.response.MealFoodDetailResponse;
+import com.ssafy.yamyam_coach.service.daily_diet.response.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -115,16 +112,17 @@ public class DailyDietService {
                 .collect(Collectors.toMap(MealDetail::getType, Function.identity()));
 
         // 4. 아침에 속한 meal food 들 조회
-        List<MealFoodDetailResponse> breakfastDetails = extractMealFoodDetailsByType(mealDetailByType, BREAKFAST);
+
+        MealDetailResponse breakfast = extractMealFoodDetailsByType(mealDetailByType, BREAKFAST);
 
         // 5. 점심에 속한 meal food 들 조회
-        List<MealFoodDetailResponse> lunchDetails = extractMealFoodDetailsByType(mealDetailByType, LUNCH);
+        MealDetailResponse lunch = extractMealFoodDetailsByType(mealDetailByType, LUNCH);
 
         // 6. 저녁에 속한 meal food 들 조회
-        List<MealFoodDetailResponse> dinnerDetails = extractMealFoodDetailsByType(mealDetailByType, DINNER);
+        MealDetailResponse dinner = extractMealFoodDetailsByType(mealDetailByType, DINNER);
 
         // 7. 간식에 속한 meal food 들 조회
-        List<MealFoodDetailResponse> snackDetails = extractMealFoodDetailsByType(mealDetailByType, SNACK);
+        MealDetailResponse snack = extractMealFoodDetailsByType(mealDetailByType, SNACK);
 
         // 8. 결과 반환
         return DailyDietDetailResponse.builder()
@@ -132,10 +130,10 @@ public class DailyDietService {
                 .date(dailyDietDetail.getDate())
                 .dayOfWeek(dailyDietDetail.getDate().getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.KOREAN))
                 .description(dailyDietDetail.getDescription())
-                .breakfast(breakfastDetails)
-                .lunch(lunchDetails)
-                .dinner(dinnerDetails)
-                .snack(snackDetails)
+                .breakfast(breakfast)
+                .lunch(lunch)
+                .dinner(dinner)
+                .snack(snack)
                 .build();
     }
 
@@ -259,6 +257,14 @@ public class DailyDietService {
                 .quantity(mealFoodDetail.getQuantity())
                 .unit(mealFoodDetail.getFood().getBaseUnit())
                 .energyPer100(mealFoodDetail.getFood().getEnergyPer100())
+                .proteinPer100(mealFoodDetail.getFood().getProteinPer100())
+                .fatPer100(mealFoodDetail.getFood().getFatPer100())
+                .carbohydratePer100(mealFoodDetail.getFood().getCarbohydratePer100())
+                .sugarPer100(mealFoodDetail.getFood().getSugarPer100())
+                .sodiumPer100(mealFoodDetail.getFood().getSodiumPer100())
+                .cholesterolPer100(mealFoodDetail.getFood().getCholesterolPer100())
+                .saturatedFatPer100(mealFoodDetail.getFood().getSaturatedFatPer100())
+                .transFatPer100(mealFoodDetail.getFood().getTransFatPer100())
                 .build();
     }
 
@@ -268,13 +274,21 @@ public class DailyDietService {
         }
     }
 
-    private List<MealFoodDetailResponse> extractMealFoodDetailsByType(Map<MealType, MealDetail> mealDetailByType, MealType type) {
+    private MealDetailResponse extractMealFoodDetailsByType(Map<MealType, MealDetail> mealDetailByType, MealType type) {
         if (mealDetailByType.get(type) == null) {
-            return List.of();
+            return MealDetailResponse.builder().build();
         }
 
-        return mealDetailByType.get(type).getMealFoods().stream()
+        MealDetail mealDetail = mealDetailByType.get(type);
+
+        List<MealFoodDetailResponse> mealFoods = mealDetail.getMealFoods().stream()
                 .map(this::toMealFoodDetailResponse)
                 .toList();
+
+        return MealDetailResponse.builder()
+                .mealId(mealDetail.getId())
+                .mealFoods(mealFoods)
+                .build();
+
     }
 }

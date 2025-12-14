@@ -13,15 +13,18 @@ public class MealFoodDetailResponse {
     private final String foodName;
     private final String category;
     private final BaseUnit baseUnit;
-    private final Double energyPer100;
-    private final Double proteinPer100;
-    private final Double fatPer100;
-    private final Double carbohydratePer100;
+    private final Double energyPer100;        // 에너지(kcal/100단위)
+    private final Double proteinPer100;       // 단백질(g/100단위)
+    private final Double fatPer100;           // 지방(g/100단위)
+    private final Double carbohydratePer100;  // 탄수화물(g/100단위)
+    private final Double sugarPer100;         // 당(g/100단위)
+    private final Double sodiumPer100;        // 나트륨(mg/100단위)
+    private final Double cholesterolPer100;   // 콜레스테롤(mg/100단위)
+    private final Double saturatedFatPer100;  // 포화지방(g/100단위)
+    private final Double transFatPer100;      // 트랜스지방(g/100단위)
 
     @Builder
-    private MealFoodDetailResponse(Long mealFoodId, Double quantity, Long foodId, String foodName,
-                                          String category, BaseUnit baseUnit, Double energyPer100,
-                                          Double proteinPer100, Double fatPer100, Double carbohydratePer100) {
+    private MealFoodDetailResponse(Long mealFoodId, Double quantity, Long foodId, String foodName, String category, BaseUnit baseUnit, Double energyPer100, Double proteinPer100, Double fatPer100, Double carbohydratePer100, Double sugarPer100, Double sodiumPer100, Double cholesterolPer100, Double saturatedFatPer100, Double transFatPer100) {
         this.mealFoodId = mealFoodId;
         this.quantity = quantity;
         this.foodId = foodId;
@@ -32,6 +35,11 @@ public class MealFoodDetailResponse {
         this.proteinPer100 = proteinPer100;
         this.fatPer100 = fatPer100;
         this.carbohydratePer100 = carbohydratePer100;
+        this.sugarPer100 = sugarPer100;
+        this.sodiumPer100 = sodiumPer100;
+        this.cholesterolPer100 = cholesterolPer100;
+        this.saturatedFatPer100 = saturatedFatPer100;
+        this.transFatPer100 = transFatPer100;
     }
 
     public static MealFoodDetailResponse from(MealFoodDetail mealFoodDetail) {
@@ -46,6 +54,11 @@ public class MealFoodDetailResponse {
                 .proteinPer100(mealFoodDetail.getFood().getProteinPer100())
                 .fatPer100(mealFoodDetail.getFood().getFatPer100())
                 .carbohydratePer100(mealFoodDetail.getFood().getCarbohydratePer100())
+                .sugarPer100(mealFoodDetail.getFood().getSugarPer100())
+                .sodiumPer100(mealFoodDetail.getFood().getSodiumPer100())
+                .cholesterolPer100(mealFoodDetail.getFood().getCholesterolPer100())
+                .saturatedFatPer100(mealFoodDetail.getFood().getSaturatedFatPer100())
+                .transFatPer100(mealFoodDetail.getFood().getTransFatPer100())
                 .build();
     }
 }

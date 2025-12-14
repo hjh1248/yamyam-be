@@ -9,6 +9,8 @@ import com.ssafy.yamyam_coach.service.daily_diet.DailyDietService;
 import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietDetailResponse;
 import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietResponse;
 import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietsResponse;
+import com.ssafy.yamyam_coach.service.daily_diet.response.MealDetailResponse;
+import com.ssafy.yamyam_coach.service.meal.response.MealFoodDetailResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -358,15 +360,20 @@ class DailyDietControllerTest extends RestControllerTestSupport {
                 Long dietPlanId = 1L;
                 LocalDate date = LocalDate.of(2025, 12, 13);
 
+                MealDetailResponse mealResponse = MealDetailResponse.builder()
+                        .mealId(1L)
+                        .mealFoods(List.of())
+                        .build();
+
                 DailyDietDetailResponse response = DailyDietDetailResponse.builder()
                         .dailyDietId(1L)
                         .date(date)
                         .dayOfWeek("금요일")
                         .description("고단백 식단")
-                        .breakfast(Collections.emptyList())
-                        .lunch(Collections.emptyList())
-                        .dinner(Collections.emptyList())
-                        .snack(Collections.emptyList())
+                        .breakfast(mealResponse)
+                        .lunch(mealResponse)
+                        .dinner(mealResponse)
+                        .snack(mealResponse)
                         .build();
 
                 // stubbing
@@ -383,10 +390,10 @@ class DailyDietControllerTest extends RestControllerTestSupport {
                         .andExpect(jsonPath("$.date").value("2025-12-13"))
                         .andExpect(jsonPath("$.dayOfWeek").value("금요일"))
                         .andExpect(jsonPath("$.description").value("고단백 식단"))
-                        .andExpect(jsonPath("$.breakfast").isArray())
-                        .andExpect(jsonPath("$.lunch").isArray())
-                        .andExpect(jsonPath("$.dinner").isArray())
-                        .andExpect(jsonPath("$.snack").isArray());
+                        .andExpect(jsonPath("$.breakfast.mealFoods").isArray())
+                        .andExpect(jsonPath("$.lunch.mealFoods").isArray())
+                        .andExpect(jsonPath("$.dinner.mealFoods").isArray())
+                        .andExpect(jsonPath("$.snack.mealFoods").isArray());
             }
         }
 
