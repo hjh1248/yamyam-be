@@ -2,6 +2,8 @@ package com.ssafy.yamyam_coach.controller.daily_diet;
 
 import com.ssafy.yamyam_coach.controller.daily_diet.request.DailyDietUpdateRequest;
 import com.ssafy.yamyam_coach.controller.daily_diet.request.RegisterDailyDietRequest;
+import com.ssafy.yamyam_coach.domain.user.User;
+import com.ssafy.yamyam_coach.global.annotation.LoginUser;
 import com.ssafy.yamyam_coach.service.daily_diet.DailyDietService;
 import com.ssafy.yamyam_coach.service.daily_diet.request.DailyDietDetailServiceRequest;
 import com.ssafy.yamyam_coach.service.daily_diet.request.DailyDietUpdateServiceRequest;
@@ -26,11 +28,10 @@ public class DailyDietController {
     private final DailyDietService dailyDietService;
 
     @PostMapping
-    public ResponseEntity<Void> registerDailyDiet(@RequestBody @Valid RegisterDailyDietRequest request) {
+    public ResponseEntity<Void> registerDailyDiet(@LoginUser User currentUser, @RequestBody @Valid RegisterDailyDietRequest request) {
+        Long currentUserId = currentUser.getId();
+        log.debug("[DailyDietController.registerDailyDiet]: daily diet 등록 요청! user id = {}", currentUserId);
 
-        log.debug("[DailyDietController.registerDailyDiet]: daily diet 등록 요청!");
-
-        Long currentUserId = 1L;
         Long createdDailyDietId = dailyDietService.registerDailyDiet(currentUserId, request.toServiceRequest());
         log.debug("[DailyDietController.registerDailyDiet]: createdDailyDietId: {}", createdDailyDietId);
 
@@ -45,7 +46,6 @@ public class DailyDietController {
 
     @GetMapping
     public ResponseEntity<DailyDietsResponse> getDailyDietByDietPlan(@PathVariable Long dietPlanId) {
-
         log.debug("[DailyDietController.getDailyDietByDietPlan]: diet plan 에 속한 daily diet 요청! diet plan id = {}", dietPlanId);
         return ResponseEntity.ok(dailyDietService.getDailyDietByDietPlan(dietPlanId));
     }
@@ -63,9 +63,8 @@ public class DailyDietController {
     }
 
     @PatchMapping("/{dailyDietId}")
-    public ResponseEntity<Void> updateDailyDiet(@PathVariable Long dailyDietId, @RequestBody DailyDietUpdateRequest request) {
-
-        Long currentUserId = 1L;
+    public ResponseEntity<Void> updateDailyDiet(@LoginUser User currentUser, @PathVariable Long dailyDietId, @RequestBody DailyDietUpdateRequest request) {
+        Long currentUserId = currentUser.getId();
         log.debug("[DailyDietController.updateDescription]: daily diet update 요청! daily diet id = {}, userId = {}", dailyDietId, currentUserId);
 
         DailyDietUpdateServiceRequest serviceRequest = DailyDietUpdateServiceRequest.builder()
@@ -80,8 +79,8 @@ public class DailyDietController {
     }
 
     @DeleteMapping("/{dailyDietId}")
-    public ResponseEntity<Void> deleteDailyDiet(@PathVariable Long dailyDietId) {
-        Long currentUserId = 1L;
+    public ResponseEntity<Void> deleteDailyDiet(@LoginUser User currentUser, @PathVariable Long dailyDietId) {
+        Long currentUserId = currentUser.getId();
         log.debug("[DailyDietController.deleteDailyDiet]: daily diet delete 요청! daily diet id = {}, userId = {}", dailyDietId, currentUserId);
 
         dailyDietService.deleteDailyDiet(currentUserId, dailyDietId);

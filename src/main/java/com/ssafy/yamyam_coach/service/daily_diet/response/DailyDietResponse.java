@@ -1,5 +1,6 @@
 package com.ssafy.yamyam_coach.service.daily_diet.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,6 +12,8 @@ import java.util.Locale;
 public class DailyDietResponse {
 
     private Long dailyDietId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
     private String dayOfWeek;
     private String description;

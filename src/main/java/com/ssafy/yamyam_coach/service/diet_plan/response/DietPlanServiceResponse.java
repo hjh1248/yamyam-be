@@ -1,5 +1,6 @@
 package com.ssafy.yamyam_coach.service.diet_plan.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,7 +12,9 @@ public class DietPlanServiceResponse {
     private Long dietPlanId;
     private String title;
     private String content;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private boolean isPrimary;
 

@@ -1,6 +1,8 @@
 package com.ssafy.yamyam_coach;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.security.CustomUserDetailsService;
 import com.ssafy.yamyam_coach.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +11,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 public abstract class RestControllerTestSupport {
 
-    @Autowired
-    protected ObjectMapper objectMapper;
+    protected final User mockUser = User.createMockUser();
 
-    @Autowired
     protected MockMvc mockMvc;
 
     @MockitoBean
@@ -20,4 +20,7 @@ public abstract class RestControllerTestSupport {
 
     @MockitoBean
     protected CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    protected ObjectMapper objectMapper;
 }

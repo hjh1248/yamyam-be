@@ -1,10 +1,15 @@
 package com.ssafy.yamyam_coach.controller.diet_plan;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.yamyam_coach.MockLoginUserArgumentResolver;
 import com.ssafy.yamyam_coach.RestControllerTestSupport;
+import com.ssafy.yamyam_coach.controller.daily_diet.DailyDietController;
 import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDietPlanRequest;
+import com.ssafy.yamyam_coach.exception.common.advice.GlobalRestExceptionHandler;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
 import com.ssafy.yamyam_coach.service.diet_plan.DietPlanService;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -34,6 +40,16 @@ class DietPlanControllerTest extends RestControllerTestSupport {
 
     @MockitoBean
     DietPlanService dietPlanService;
+
+    @BeforeEach
+    void setUp() {
+        MockLoginUserArgumentResolver mockLoginUserArgumentResolver = new MockLoginUserArgumentResolver(mockUser);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(new DietPlanController(dietPlanService))
+                .setCustomArgumentResolvers(mockLoginUserArgumentResolver)
+                .setControllerAdvice(new GlobalRestExceptionHandler())
+                .build();
+    }
 
     @Nested
     @DisplayName("registerDietPlan")

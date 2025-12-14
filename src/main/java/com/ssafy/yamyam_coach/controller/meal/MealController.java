@@ -4,6 +4,8 @@ import com.ssafy.yamyam_coach.controller.meal.request.CreateMealFoodRequest;
 import com.ssafy.yamyam_coach.controller.meal.request.CreateMealRequest;
 import com.ssafy.yamyam_coach.controller.meal.request.UpdateMealFoodRequest;
 import com.ssafy.yamyam_coach.controller.meal.request.UpdateMealRequest;
+import com.ssafy.yamyam_coach.domain.user.User;
+import com.ssafy.yamyam_coach.global.annotation.LoginUser;
 import com.ssafy.yamyam_coach.service.meal.MealService;
 import com.ssafy.yamyam_coach.service.meal.request.CreateMealServiceRequest;
 import com.ssafy.yamyam_coach.service.meal.request.UpdateMealServiceRequest;
@@ -27,8 +29,8 @@ public class MealController {
     private final MealService mealService;
 
     @PostMapping
-    public ResponseEntity<Void> registerMeal(@PathVariable Long dailyDietId, @RequestBody @Valid CreateMealRequest request) {
-        Long currentUserId = 1L;
+    public ResponseEntity<Void> registerMeal(@LoginUser User currentUser, @PathVariable Long dailyDietId, @RequestBody @Valid CreateMealRequest request) {
+        Long currentUserId = currentUser.getId();
 
         log.debug("[MealController.registerMeal] meal 등록 요청! dailyDietId: {}", dailyDietId);
 
@@ -57,8 +59,8 @@ public class MealController {
     }
 
     @PatchMapping("/{mealId}")
-    public ResponseEntity<Void> updateMeal(@PathVariable Long mealId, @RequestBody @Valid UpdateMealRequest request) {
-        Long currentUserId = 1L;
+    public ResponseEntity<Void> updateMeal(@LoginUser User currentUser, @PathVariable Long mealId, @RequestBody @Valid UpdateMealRequest request) {
+        Long currentUserId = currentUser.getId();
 
         log.debug("[MealController.updateMeal] meal update 요청! mealId: {}", mealId);
 
@@ -73,8 +75,8 @@ public class MealController {
     }
 
     @DeleteMapping("/{mealId}")
-    public ResponseEntity<Void> deleteMeal(@PathVariable Long mealId) {
-        Long currentUserId = 1L;
+    public ResponseEntity<Void> deleteMeal(@LoginUser User currentUser, @PathVariable Long mealId) {
+        Long currentUserId = currentUser.getId();
         log.debug("[MealController.deleteMeal] meal delete 요청! mealId: {}", mealId);
         mealService.deleteMeal(currentUserId, mealId);
         return ResponseEntity.noContent().build();

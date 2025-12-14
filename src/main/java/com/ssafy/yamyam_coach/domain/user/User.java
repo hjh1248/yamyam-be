@@ -21,6 +21,12 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public static User createMockUser() {
+        User mockUser = User.builder().build();
+        mockUser.id = 999999L;
+        return mockUser;
+    }
+
     @Builder
     private User(String email, String password, String nickname, String name, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.email = email;

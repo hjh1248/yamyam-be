@@ -1,8 +1,12 @@
 package com.ssafy.yamyam_coach.controller.daily_diet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ssafy.yamyam_coach.MockLoginUserArgumentResolver;
 import com.ssafy.yamyam_coach.RestControllerTestSupport;
 import com.ssafy.yamyam_coach.controller.daily_diet.request.DailyDietUpdateRequest;
 import com.ssafy.yamyam_coach.controller.daily_diet.request.RegisterDailyDietRequest;
+import com.ssafy.yamyam_coach.exception.common.advice.GlobalRestExceptionHandler;
 import com.ssafy.yamyam_coach.exception.daily_diet.DailyDietException;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
 import com.ssafy.yamyam_coach.service.daily_diet.DailyDietService;
@@ -10,7 +14,7 @@ import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietDetailRespons
 import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietResponse;
 import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietsResponse;
 import com.ssafy.yamyam_coach.service.daily_diet.response.MealDetailResponse;
-import com.ssafy.yamyam_coach.service.meal.response.MealFoodDetailResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,13 +22,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static com.ssafy.yamyam_coach.exception.daily_diet.DailyDietErrorCode.*;
 import static org.hamcrest.Matchers.endsWith;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -41,6 +46,16 @@ class DailyDietControllerTest extends RestControllerTestSupport {
 
     @MockitoBean
     DailyDietService dailyDietService;
+
+    @BeforeEach
+    public void setUp() {
+        MockLoginUserArgumentResolver mockLoginUserArgumentResolver = new MockLoginUserArgumentResolver(mockUser);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(new DailyDietController(dailyDietService))
+                .setCustomArgumentResolvers(mockLoginUserArgumentResolver)
+                .setControllerAdvice(new GlobalRestExceptionHandler())
+                .build();
+    }
 
     @Nested
     @DisplayName("registerDailyDiet")

@@ -1,6 +1,8 @@
 package com.ssafy.yamyam_coach.controller.diet_plan;
 
 import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDietPlanRequest;
+import com.ssafy.yamyam_coach.domain.user.User;
+import com.ssafy.yamyam_coach.global.annotation.LoginUser;
 import com.ssafy.yamyam_coach.service.diet_plan.DietPlanService;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
 import jakarta.validation.Valid;
@@ -22,12 +24,13 @@ public class DietPlanController {
     private final DietPlanService dietPlanService;
 
     @PostMapping
-    public ResponseEntity<Void> registerDietPlan(@RequestBody @Valid CreateDietPlanRequest request) {
+    public ResponseEntity<Void> registerDietPlan(@LoginUser User currentUser, @RequestBody @Valid CreateDietPlanRequest request) {
 
         log.debug("[DietPlanController.registerDietPlan]: diet plan 생성 요청: {}", request);
 
+        Long currentUserId = currentUser.getId();
         /** todo 추후 jwt 에서 꺼내오도록 변경 예정 */
-        Long createdPlanId = dietPlanService.registerDietPlan(1L, request.toServiceRequest());
+        Long createdPlanId = dietPlanService.registerDietPlan(currentUserId, request.toServiceRequest());
 
         log.debug("[DietPlanController.registerDietPlan]: diet plan 생성완료! id: {}", createdPlanId);
         URI location = ServletUriComponentsBuilder
@@ -45,27 +48,33 @@ public class DietPlanController {
     }
 
     @PatchMapping("/{dietPlanId}")
-    public ResponseEntity<Void> changePrimaryDietPlan(@PathVariable Long dietPlanId) {
+    public ResponseEntity<Void> changePrimaryDietPlan(@LoginUser User currentUser, @PathVariable Long dietPlanId) {
         log.debug("[DietPlanController.deleteDietPlan]: 대표 식단 변경 요청. target diet plan id = {}", dietPlanId);
-        dietPlanService.changePrimaryDietPlanTo(1L, dietPlanId);
+
+        Long currentUserId = currentUser.getId();
+        dietPlanService.changePrimaryDietPlanTo(currentUserId, dietPlanId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{dietPlanId}")
-    public ResponseEntity<Void> deleteDietPlan(@PathVariable Long dietPlanId) {
+    public ResponseEntity<Void> deleteDietPlan(@LoginUser User currentUser, @PathVariable Long dietPlanId) {
         log.debug("[DietPlanController.deleteDietPlan]: 식단 삭제 요청. diet plan id = {}", dietPlanId);
-        dietPlanService.deleteById(1L, dietPlanId);
+
+        Long currentUserId = currentUser.getId();
+        dietPlanService.deleteById(currentUserId, dietPlanId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<DietPlanServiceResponse>> getMyDietPlans() {
-        return ResponseEntity.ok(dietPlanService.getMyDietPlans(1L));
+    public ResponseEntity<List<DietPlanServiceResponse>> getMyDietPlans(@LoginUser User currentUser) {
+        Long currentUserId = currentUser.getId();
+        return ResponseEntity.ok(dietPlanService.getMyDietPlans(currentUserId));
     }
 
     @GetMapping("/my/primary")
-    public ResponseEntity<DietPlanServiceResponse> getPrimaryDietPlan() {
-        return ResponseEntity.ok(dietPlanService.getPrimaryDietPlan(1L));
+    public ResponseEntity<DietPlanServiceResponse> getPrimaryDietPlan(@LoginUser User currentUser) {
+        Long currentUserId = currentUser.getId();
+        return ResponseEntity.ok(dietPlanService.getPrimaryDietPlan(currentUserId));
     }
 
 }

@@ -1,18 +1,23 @@
 package com.ssafy.yamyam_coach.controller.meal;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.yamyam_coach.MockLoginUserArgumentResolver;
 import com.ssafy.yamyam_coach.RestControllerTestSupport;
+import com.ssafy.yamyam_coach.controller.food.FoodController;
 import com.ssafy.yamyam_coach.controller.meal.request.CreateMealFoodRequest;
 import com.ssafy.yamyam_coach.controller.meal.request.CreateMealRequest;
 import com.ssafy.yamyam_coach.controller.meal.request.UpdateMealFoodRequest;
 import com.ssafy.yamyam_coach.controller.meal.request.UpdateMealRequest;
 import com.ssafy.yamyam_coach.domain.food.BaseUnit;
 import com.ssafy.yamyam_coach.domain.meals.MealType;
+import com.ssafy.yamyam_coach.exception.common.advice.GlobalRestExceptionHandler;
 import com.ssafy.yamyam_coach.exception.daily_diet.DailyDietException;
 import com.ssafy.yamyam_coach.exception.food.FoodException;
 import com.ssafy.yamyam_coach.exception.meal.MealException;
 import com.ssafy.yamyam_coach.service.meal.MealService;
 import com.ssafy.yamyam_coach.service.meal.response.MealDetailResponse;
 import com.ssafy.yamyam_coach.service.meal.response.MealFoodDetailResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,6 +26,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
@@ -42,6 +48,16 @@ class MealControllerTest extends RestControllerTestSupport {
 
     @MockitoBean
     MealService mealService;
+
+    @BeforeEach
+    void setUp() {
+        MockLoginUserArgumentResolver mockLoginUserArgumentResolver = new MockLoginUserArgumentResolver(mockUser);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(new MealController(mealService))
+                .setCustomArgumentResolvers(mockLoginUserArgumentResolver)
+                .setControllerAdvice(new GlobalRestExceptionHandler())
+                .build();
+    }
 
     @Nested
     @DisplayName("registerMeal")

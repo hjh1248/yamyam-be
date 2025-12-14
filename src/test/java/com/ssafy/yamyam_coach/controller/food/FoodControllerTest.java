@@ -1,15 +1,20 @@
 package com.ssafy.yamyam_coach.controller.food;
 
+import com.ssafy.yamyam_coach.MockLoginUserArgumentResolver;
 import com.ssafy.yamyam_coach.RestControllerTestSupport;
+import com.ssafy.yamyam_coach.controller.diet_plan.DietPlanController;
 import com.ssafy.yamyam_coach.domain.food.BaseUnit;
+import com.ssafy.yamyam_coach.exception.common.advice.GlobalRestExceptionHandler;
 import com.ssafy.yamyam_coach.service.food.FoodService;
 import com.ssafy.yamyam_coach.service.food.response.SearchFoodServiceResponse;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 
@@ -26,6 +31,16 @@ class FoodControllerTest extends RestControllerTestSupport {
 
     @MockitoBean
     FoodService foodService;
+
+    @BeforeEach
+    void setUp() {
+        MockLoginUserArgumentResolver mockLoginUserArgumentResolver = new MockLoginUserArgumentResolver(mockUser);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(new FoodController(foodService))
+                .setCustomArgumentResolvers(mockLoginUserArgumentResolver)
+                .setControllerAdvice(new GlobalRestExceptionHandler())
+                .build();
+    }
 
     @Nested
     @DisplayName("searchFood")
