@@ -24,10 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // 2. Spring Security가 이해할 수 있는 UserDetails 객체로 변환해서 리턴
         // (여기서는 권한을 일단 "ROLE_USER"로 통일했어)
-        return new org.springframework.security.core.userdetails.User(
-                user.getEmail(),
-                user.getPassword(),
-                Collections.emptyList() // 권한 리스트 (지금은 비워둠)
-        );
+        return new CustomUserDetails(user);
     }
 }
