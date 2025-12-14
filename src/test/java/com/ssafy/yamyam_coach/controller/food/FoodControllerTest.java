@@ -2,7 +2,6 @@ package com.ssafy.yamyam_coach.controller.food;
 
 import com.ssafy.yamyam_coach.MockLoginUserArgumentResolver;
 import com.ssafy.yamyam_coach.RestControllerTestSupport;
-import com.ssafy.yamyam_coach.controller.diet_plan.DietPlanController;
 import com.ssafy.yamyam_coach.domain.food.BaseUnit;
 import com.ssafy.yamyam_coach.exception.common.advice.GlobalRestExceptionHandler;
 import com.ssafy.yamyam_coach.service.food.FoodService;

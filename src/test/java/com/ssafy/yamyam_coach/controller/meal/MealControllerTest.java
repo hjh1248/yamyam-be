@@ -1,9 +1,7 @@
 package com.ssafy.yamyam_coach.controller.meal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.yamyam_coach.MockLoginUserArgumentResolver;
 import com.ssafy.yamyam_coach.RestControllerTestSupport;
-import com.ssafy.yamyam_coach.controller.food.FoodController;
 import com.ssafy.yamyam_coach.controller.meal.request.CreateMealFoodRequest;
 import com.ssafy.yamyam_coach.controller.meal.request.CreateMealRequest;
 import com.ssafy.yamyam_coach.controller.meal.request.UpdateMealFoodRequest;

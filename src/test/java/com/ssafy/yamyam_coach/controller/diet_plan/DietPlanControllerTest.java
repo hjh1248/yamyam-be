@@ -1,9 +1,7 @@
 package com.ssafy.yamyam_coach.controller.diet_plan;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.yamyam_coach.MockLoginUserArgumentResolver;
 import com.ssafy.yamyam_coach.RestControllerTestSupport;
-import com.ssafy.yamyam_coach.controller.daily_diet.DailyDietController;
 import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDietPlanRequest;
 import com.ssafy.yamyam_coach.exception.common.advice.GlobalRestExceptionHandler;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;

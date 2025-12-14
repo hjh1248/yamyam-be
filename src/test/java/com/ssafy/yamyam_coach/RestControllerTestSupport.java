@@ -1,7 +1,6 @@
 package com.ssafy.yamyam_coach;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.security.CustomUserDetailsService;
 import com.ssafy.yamyam_coach.security.JwtTokenProvider;
