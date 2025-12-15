@@ -1,6 +1,7 @@
 package com.ssafy.yamyam_coach.repository.diet_plan;
 
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
+import com.ssafy.yamyam_coach.repository.diet_plan.request.UpdateDietPlanRepositoryRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +23,6 @@ public interface DietPlanRepository {
     int deActivateCurrentPrimaryDietPlan(Long userId);
 
     int activateCurrentPrimaryDietPlan(Long userId, Long dietPlanId);
+
+    int update(UpdateDietPlanRepositoryRequest repositoryRequest);
 }

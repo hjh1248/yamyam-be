@@ -1,6 +1,7 @@
 package com.ssafy.yamyam_coach.mapper.diet_plan;
 
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
+import com.ssafy.yamyam_coach.repository.diet_plan.request.UpdateDietPlanRepositoryRequest;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +25,6 @@ public interface DietPlanMapper {
     int deActivateCurrentPrimaryDietPlan(Long userId);
 
     int activateCurrentPrimaryDietPlan(@Param("userId") Long userId, @Param("dietPlanId") Long dietPlanId);
+
+    int update(UpdateDietPlanRepositoryRequest repositoryRequest);
 }

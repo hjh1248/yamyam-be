@@ -2,6 +2,7 @@ package com.ssafy.yamyam_coach.repository.diet_plan;
 
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.mapper.diet_plan.DietPlanMapper;
+import com.ssafy.yamyam_coach.repository.diet_plan.request.UpdateDietPlanRepositoryRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -52,6 +53,11 @@ public class MybatisDietPlanRepository implements DietPlanRepository {
     @Override
     public int activateCurrentPrimaryDietPlan(Long userId, Long dietPlanId) {
         return dietPlanMapper.activateCurrentPrimaryDietPlan(userId, dietPlanId);
+    }
+
+    @Override
+    public int update(UpdateDietPlanRepositoryRequest repositoryRequest) {
+        return dietPlanMapper.update(repositoryRequest);
     }
 
 }

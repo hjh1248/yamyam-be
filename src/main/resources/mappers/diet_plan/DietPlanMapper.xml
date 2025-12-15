@@ -57,4 +57,24 @@
         WHERE user_id = #{userId}
           AND id = #{dietPlanId}
     </update>
+
+    <update id="update"
+            parameterType="com.ssafy.yamyam_coach.repository.diet_plan.request.UpdateDietPlanRepositoryRequest">
+        UPDATE diet_plans
+        <set>
+            <if test="content != null">
+                content = #{content},
+            </if>
+
+            <if test="startDate != null">
+                start_date = #{startDate},
+            </if>
+
+            <if test="endDate!= null">
+                end_date = #{endDate},
+            </if>
+        </set>
+
+        WHERE id = #{dietPlanId}
+    </update>
 </mapper>

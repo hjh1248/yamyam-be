@@ -3,8 +3,10 @@ package com.ssafy.yamyam_coach.repository.diet_plan;
 import com.ssafy.yamyam_coach.IntegrationTestSupport;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.user.User;
+import com.ssafy.yamyam_coach.repository.diet_plan.request.UpdateDietPlanRepositoryRequest;
 import com.ssafy.yamyam_coach.repository.user.UserRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -165,5 +167,154 @@ class DietPlanRepositoryTest extends IntegrationTestSupport {
         assertThat(usersPrimaryDietPlanOpt).isPresent();
         DietPlan primaryDietPlan = usersPrimaryDietPlanOpt.get();
         assertThat(primaryDietPlan.isPrimary()).isTrue();
+    }
+
+    @DisplayName("식단 계획 정보를 업데이트할 수 있다.")
+    @Nested
+    class UpdateTest {
+
+        @DisplayName("Content 필드만 업데이트 할 수 있어야 한다.")
+        @Test
+        void updateOnlyContent() {
+            // given
+            User user = createUser("test user", "test nickname", "test@email.com", "password");
+            userRepository.save(user);
+
+            // 기존 데이터 생성 (시작일/종료일 기준)
+            LocalDate oldStartDate = LocalDate.of(2025, 1, 1);
+            LocalDate oldEndDate = LocalDate.of(2025, 1, 10);
+
+            DietPlan originalPlan = createDietPlan(user.getId(), "Original Title", "Old Content", false, false, oldStartDate, oldEndDate);
+            dietPlanRepository.insert(originalPlan);
+
+            // 업데이트 요청 데이터 (Content만 변경)
+            String newContent = "New Content Updated";
+            UpdateDietPlanRepositoryRequest request = new UpdateDietPlanRepositoryRequest();
+            request.setDietPlanId(originalPlan.getId());
+            request.setContent(newContent);
+
+            // when
+            int updatedRows = dietPlanRepository.update(request);
+            Optional<DietPlan> updatedPlanOpt = dietPlanRepository.findById(originalPlan.getId());
+
+            // then
+            assertThat(updatedRows).isEqualTo(1);
+            assertThat(updatedPlanOpt).isPresent();
+
+            DietPlan updatedPlan = updatedPlanOpt.get();
+
+            assertThat(updatedPlan.getContent()).isEqualTo(newContent);
+            assertThat(updatedPlan.getStartDate()).isEqualTo(oldStartDate);
+            assertThat(updatedPlan.getEndDate()).isEqualTo(oldEndDate);
+        }
+
+        @DisplayName("StartDate 필드만 업데이트 할 수 있어야 한다.")
+        @Test
+        void updateOnlyStartDate() {
+            // given
+            User user = createUser("test user", "test nickname", "test@email.com", "password");
+            userRepository.save(user);
+
+            LocalDate oldStartDate = LocalDate.of(2025, 1, 1);
+            LocalDate oldEndDate = LocalDate.of(2025, 1, 10);
+
+            DietPlan originalPlan = createDietPlan(user.getId(), "Title", "Content", false, false, oldStartDate, oldEndDate);
+            dietPlanRepository.insert(originalPlan);
+
+            // 업데이트 요청 데이터 (StartDate만 변경)
+            LocalDate newStartDate = LocalDate.of(2025, 1, 5);
+            UpdateDietPlanRepositoryRequest request = new UpdateDietPlanRepositoryRequest();
+            request.setDietPlanId(originalPlan.getId());
+            request.setStartDate(newStartDate);
+            // content와 endDate는 null 유지
+
+            // when
+            int updatedRows = dietPlanRepository.update(request);
+            Optional<DietPlan> updatedPlanOpt = dietPlanRepository.findById(originalPlan.getId());
+
+            // then
+            assertThat(updatedRows).isEqualTo(1);
+            assertThat(updatedPlanOpt).isPresent();
+
+            DietPlan updatedPlan = updatedPlanOpt.get();
+
+            assertThat(updatedPlan.getStartDate()).isEqualTo(newStartDate);
+            assertThat(updatedPlan.getContent()).isEqualTo(originalPlan.getContent());
+            assertThat(updatedPlan.getEndDate()).isEqualTo(oldEndDate);
+        }
+
+        @DisplayName("EndDate 필드만 업데이트 할 수 있어야 한다.")
+        @Test
+        void updateOnlyEndDate() {
+            // given
+            User user = createUser("test user", "test nickname", "test@email.com", "password");
+            userRepository.save(user);
+
+            LocalDate oldStartDate = LocalDate.of(2025, 1, 1);
+            LocalDate oldEndDate = LocalDate.of(2025, 1, 10);
+
+            DietPlan originalPlan = createDietPlan(user.getId(), "Title", "Content", false, false, oldStartDate, oldEndDate);
+            dietPlanRepository.insert(originalPlan);
+
+            // 업데이트 요청 데이터 (EndDate만 변경)
+            LocalDate newEndDate = LocalDate.of(2025, 1, 31);
+            UpdateDietPlanRepositoryRequest request = new UpdateDietPlanRepositoryRequest();
+            request.setDietPlanId(originalPlan.getId());
+            request.setEndDate(newEndDate);
+            // content와 startDate는 null 유지
+
+            // when
+            int updatedRows = dietPlanRepository.update(request);
+            Optional<DietPlan> updatedPlanOpt = dietPlanRepository.findById(originalPlan.getId());
+
+            // then
+            assertThat(updatedRows).isEqualTo(1);
+            assertThat(updatedPlanOpt).isPresent();
+
+            DietPlan updatedPlan = updatedPlanOpt.get();
+
+            assertThat(updatedPlan.getEndDate()).isEqualTo(newEndDate);
+            assertThat(updatedPlan.getContent()).isEqualTo(originalPlan.getContent());
+            assertThat(updatedPlan.getStartDate()).isEqualTo(oldStartDate);
+        }
+
+        // --- 다중 필드 업데이트 시나리오 ---
+
+        @DisplayName("Content와 Date 필드를 동시에 업데이트 할 수 있어야 한다.")
+        @Test
+        void updateMultipleFields() {
+            // given
+            User user = createUser("test user", "test nickname", "test@email.com", "password");
+            userRepository.save(user);
+
+            DietPlan originalPlan = createDietPlan(user.getId(), "Old Content", "Title", false, false, LocalDate.of(2025, 1, 1), LocalDate.of(2025, 1, 10));
+            dietPlanRepository.insert(originalPlan);
+
+            // 업데이트 요청 데이터 (Content, StartDate, EndDate 모두 변경)
+            String newContent = "All Fields Changed";
+            LocalDate newStartDate = LocalDate.of(2025, 2, 1);
+            LocalDate newEndDate = LocalDate.of(2025, 2, 28);
+
+            UpdateDietPlanRepositoryRequest request = new UpdateDietPlanRepositoryRequest();
+            request.setDietPlanId(originalPlan.getId());
+            request.setContent(newContent);
+            request.setStartDate(newStartDate);
+            request.setEndDate(newEndDate);
+
+            // when
+            int updatedRows = dietPlanRepository.update(request);
+            Optional<DietPlan> updatedPlanOpt = dietPlanRepository.findById(originalPlan.getId());
+
+            // then
+            assertThat(updatedRows).isEqualTo(1);
+            assertThat(updatedPlanOpt).isPresent();
+
+            DietPlan updatedPlan = updatedPlanOpt.get();
+
+            // 모든 필드가 변경되었는지 확인
+            assertThat(updatedPlan.getContent()).isEqualTo(newContent);
+            assertThat(updatedPlan.getStartDate()).isEqualTo(newStartDate);
+            assertThat(updatedPlan.getEndDate()).isEqualTo(newEndDate);
+        }
     }
 }
