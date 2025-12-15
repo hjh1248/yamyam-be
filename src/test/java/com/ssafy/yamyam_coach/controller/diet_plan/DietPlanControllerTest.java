@@ -3,9 +3,12 @@ package com.ssafy.yamyam_coach.controller.diet_plan;
 import com.ssafy.yamyam_coach.MockLoginUserArgumentResolver;
 import com.ssafy.yamyam_coach.RestControllerTestSupport;
 import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDietPlanRequest;
+import com.ssafy.yamyam_coach.controller.diet_plan.request.UpdateDietPlanRequest;
 import com.ssafy.yamyam_coach.exception.common.advice.GlobalRestExceptionHandler;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
+import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietDetailResponse;
 import com.ssafy.yamyam_coach.service.diet_plan.DietPlanService;
+import com.ssafy.yamyam_coach.service.diet_plan.request.UpdateDietPlanServiceRequest;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,8 +22,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import static com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode.*;
 import static org.hamcrest.Matchers.endsWith;
@@ -270,7 +275,7 @@ class DietPlanControllerTest extends RestControllerTestSupport {
 
                 // when then
                 mockMvc.perform(
-                                patch("/api/diet-plans/{dietPlanId}", dietPlanId)
+                                patch("/api/diet-plans/{dietPlanId}/primary", dietPlanId)
                         )
                         .andDo(print())
                         .andExpect(status().isNoContent())
@@ -294,7 +299,7 @@ class DietPlanControllerTest extends RestControllerTestSupport {
 
                 // when then
                 mockMvc.perform(
-                                patch("/api/diet-plans/{dietPlanId}", dietPlanId)
+                                patch("/api/diet-plans/{dietPlanId}/primary", dietPlanId)
                         )
                         .andDo(print())
                         .andExpect(status().isBadRequest())
@@ -484,30 +489,177 @@ class DietPlanControllerTest extends RestControllerTestSupport {
                         .andExpect(jsonPath("$.title").value("대표 식단"))
                         .andExpect(jsonPath("$.primary").value(true));
             }
-        }
 
-        @Nested
-        @DisplayName("실패 케이스")
-        class FailureCase {
-
-            @DisplayName("대표 식단이 없을 경우 404 응답이 반환된다.")
+            @DisplayName("대표 식단이 없을 경우 빈 대표식단이 반환된다.")
             @Test
             void notFoundPrimaryDietPlan() throws Exception {
-                // given
+
+                DietPlanServiceResponse response = DietPlanServiceResponse.builder()
+                        .dietPlanId(null)
+                        .title(null)
+                        .content(null)
+                        .isPrimary(false)
+                        .startDate(null)
+                        .endDate(null)
+                        .build();
+
                 // stubbing
                 given(dietPlanService.getPrimaryDietPlan(anyLong()))
-                        .willThrow(new DietPlanException(NOT_FOUND_PRIMARY_DIET_PLAN));
+                        .willReturn(response);
 
                 // when then
                 mockMvc.perform(
                                 get("/api/diet-plans/my/primary")
                         )
                         .andDo(print())
-                        .andExpect(status().isNotFound())
-                        .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
-                        .andExpect(jsonPath("$.message").value("사용자의 대표 식단을 찾을 수 없습니다"))
-                        .andExpect(jsonPath("$.timestamp").isNotEmpty());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.dietPlanId").isEmpty())
+                        .andExpect(jsonPath("$.title").isEmpty())
+                        .andExpect(jsonPath("$.content").isEmpty())
+                        .andExpect(jsonPath("$.startDate").isEmpty())
+                        .andExpect(jsonPath("$.endDate").isEmpty())
+                        .andExpect(jsonPath("$.primary").value(false));
             }
         }
+    }
+
+    @Nested
+    @DisplayName("updateDietPlan")
+    class UpdateDietPlan {
+
+
+        @Nested
+        @DisplayName("성공 케이스")
+        class SuccessCase {
+
+            @Test
+            @DisplayName("유효한 Content 업데이트 요청 시 204 No Content를 반환한다.")
+            void updateOnlyContent() throws Exception {
+                // given
+                Long dietPlanId = 1L;
+                UpdateDietPlanRequest request = createUpdateRequest("새로운 컨텐츠", null, null);
+
+                // stubbing
+                doNothing().when(dietPlanService).updateDietPlan(anyLong(), any(UpdateDietPlanServiceRequest.class));
+
+                // when then
+                mockMvc.perform(
+                                patch("/api/diet-plans/{dietPlanId}", dietPlanId)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(request))
+                        )
+                        .andDo(print())
+                        .andExpect(status().isNoContent())
+                        .andExpect(jsonPath("$").doesNotExist());
+            }
+
+            @Test
+            @DisplayName("모든 필드 업데이트 요청 시 204 No Content를 반환한다.")
+            void updateAllFields() throws Exception {
+                // given
+                Long dietPlanId = 1L;
+                UpdateDietPlanRequest request = createUpdateRequest(
+                        "새로운 내용",
+                        LocalDate.of(2026, 1, 1),
+                        LocalDate.of(2026, 1, 30)
+                );
+
+                // stubbing
+                doNothing().when(dietPlanService).updateDietPlan(anyLong(), any(UpdateDietPlanServiceRequest.class));
+
+                // when then
+                mockMvc.perform(
+                                patch("/api/diet-plans/{dietPlanId}", dietPlanId)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(request))
+                        )
+                        .andDo(print())
+                        .andExpect(status().isNoContent())
+                        .andExpect(jsonPath("$").doesNotExist());
+            }
+
+            @DisplayName("모든 필드가 null일 경우 204 응답이 반환된다.")
+            @Test
+            void updateAllFieldsAreNull() throws Exception {
+                // given
+                Long dietPlanId = 1L;
+                UpdateDietPlanRequest request = createUpdateRequest(null, null, null);
+
+                doNothing().when(dietPlanService).updateDietPlan(anyLong(), any(UpdateDietPlanServiceRequest.class));
+
+                // when then
+                mockMvc.perform(
+                                patch("/api/diet-plans/{dietPlanId}", dietPlanId)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(request))
+                        )
+                        .andDo(print())
+                        .andExpect(status().isNoContent())
+                        .andExpect(jsonPath("$").doesNotExist());
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        class FailureCase {
+
+            @DisplayName("Diet Plan이 존재하지 않을 경우 404 응답이 반환된다.")
+            @Test
+            void notFoundDietPlan() throws Exception {
+                // given
+                Long notExistDietPlanId = 999L;
+                UpdateDietPlanRequest request = createUpdateRequest("내용", null, null);
+
+                // stubbing
+                doThrow(new DietPlanException(NOT_FOUND_DIET_PLAN))
+                        .when(dietPlanService).updateDietPlan(anyLong(), any(UpdateDietPlanServiceRequest.class));
+
+                // when then
+                mockMvc.perform(
+                                patch("/api/diet-plans/{dietPlanId}", notExistDietPlanId)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(request))
+                        )
+                        .andDo(print())
+                        .andExpect(status().isNotFound())
+                        .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                        .andExpect(jsonPath("$.message").value("해당 식단 계획을 조회할 수 없습니다."))
+                        .andExpect(jsonPath("$.timestamp").isNotEmpty());
+            }
+
+            @DisplayName("요청자 자신의 Diet Plan이 아닐 경우 403 응답이 반환된다.")
+            @Test
+            void unauthorized() throws Exception {
+                // given
+                Long othersDietPlanId = 2L;
+                UpdateDietPlanRequest request = createUpdateRequest("내용", null, null);
+
+                // stubbing
+                doThrow(new DietPlanException(UNAUTHORIZED))
+                        .when(dietPlanService).updateDietPlan(anyLong(), any(UpdateDietPlanServiceRequest.class));
+
+                // when then
+                mockMvc.perform(
+                                patch("/api/diet-plans/{dietPlanId}", othersDietPlanId)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content(objectMapper.writeValueAsString(request))
+                        )
+                        .andDo(print())
+                        .andExpect(status().isForbidden())
+                        .andExpect(jsonPath("$.status").value(HttpStatus.FORBIDDEN.value()))
+                        .andExpect(jsonPath("$.message").value("식단 계획 삭제 권한이 없습니다."))
+                        .andExpect(jsonPath("$.timestamp").isNotEmpty());
+            }
+
+        }
+    }
+
+    private UpdateDietPlanRequest createUpdateRequest(String content, LocalDate startDate, LocalDate endDate) {
+        // UpdateDietPlanRequest에 @Builder 또는 Setter가 있다고 가정합니다.
+        UpdateDietPlanRequest request = new UpdateDietPlanRequest();
+        request.setContent(content);
+        request.setStartDate(startDate);
+        request.setEndDate(endDate);
+        return request;
     }
 }

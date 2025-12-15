@@ -1,9 +1,11 @@
 package com.ssafy.yamyam_coach.controller.diet_plan;
 
 import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDietPlanRequest;
+import com.ssafy.yamyam_coach.controller.diet_plan.request.UpdateDietPlanRequest;
 import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.global.annotation.LoginUser;
 import com.ssafy.yamyam_coach.service.diet_plan.DietPlanService;
+import com.ssafy.yamyam_coach.service.diet_plan.request.UpdateDietPlanServiceRequest;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +50,22 @@ public class DietPlanController {
     }
 
     @PatchMapping("/{dietPlanId}")
+    public ResponseEntity<Void> updateDietPlan(@LoginUser User currentUser, @PathVariable Long dietPlanId, @RequestBody UpdateDietPlanRequest request) {
+        Long currentUserId = currentUser.getId();
+        log.debug("[DietPlanController.updateDietPlan]: 식단 계획 업데이트 요청. target diet plan id = {} current user = {}", dietPlanId, currentUserId);
+
+        UpdateDietPlanServiceRequest serviceRequest = UpdateDietPlanServiceRequest.builder()
+                .dietPlanId(dietPlanId)
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .content(request.getContent())
+                .build();
+
+        dietPlanService.updateDietPlan(currentUserId, serviceRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{dietPlanId}/primary")
     public ResponseEntity<Void> changePrimaryDietPlan(@LoginUser User currentUser, @PathVariable Long dietPlanId) {
         log.debug("[DietPlanController.deleteDietPlan]: 대표 식단 변경 요청. target diet plan id = {}", dietPlanId);
 

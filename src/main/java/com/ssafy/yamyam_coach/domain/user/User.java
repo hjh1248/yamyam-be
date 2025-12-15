@@ -23,7 +23,7 @@ public class User {
 
     public static User createMockUser() {
         User mockUser = User.builder().build();
-        mockUser.id = 999999L;
+        mockUser.id = 1L;
         return mockUser;
     }
 
