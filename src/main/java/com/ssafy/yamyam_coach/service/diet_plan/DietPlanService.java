@@ -112,7 +112,7 @@ public class DietPlanService {
             return;
         }
 
-        // 5. 날짜 변경되었을 경우 새 날짜 범위에 속하지 않는 날짜 추출
+        // 6. 날짜 변경되었을 경우 새 날짜 범위에 속하지 않는 날짜 추출
 
         LocalDate startDate = request.getStartDate() == null ? dietPlan.getStartDate() : request.getStartDate();
         LocalDate endDate = request.getEndDate() == null ? dietPlan.getEndDate() : request.getEndDate();
@@ -124,10 +124,10 @@ public class DietPlanService {
                 .filter(d -> d.isBefore(startDate) || d.isAfter(endDate))
                 .toList();
 
-        // 6. batch delete
+        // 7. batch delete
         dailyDietRepository.deleteByDietPlanAndDateInBatch(dietPlan.getId(), datesToDelete);
 
-        // 7. update
+        // 8. update
         UpdateDietPlanRepositoryRequest repositoryRequest = new UpdateDietPlanRepositoryRequest();
 
         repositoryRequest.setDietPlanId(dietPlan.getId());
