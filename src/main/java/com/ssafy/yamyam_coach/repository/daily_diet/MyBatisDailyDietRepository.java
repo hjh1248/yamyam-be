@@ -60,6 +60,10 @@ public class MyBatisDailyDietRepository implements DailyDietRepository {
 
     @Override
     public int deleteByDietPlanAndDateInBatch(Long dietPlanId, List<LocalDate> datesToDelete) {
+        if (datesToDelete == null || datesToDelete.isEmpty()) {
+            return 0;
+        }
+        
         return dailyDietMapper.deleteByDietPlanAndDateInBatch(dietPlanId, datesToDelete);
     }
 

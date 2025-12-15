@@ -132,12 +132,13 @@
     </delete>
 
     <delete id="deleteByDietPlanAndDateInBatch">
-        DELETE
-        FROM daily_diets
-        WHERE diet_plan_id = #{dietPlanId} AND date IN
-            <foreach collection="datesToDelete" item="dateToDelete" open="(" separator="," close=")">
-                #{dateToDelete}
+        <if test="datesToDelete != null and !datesToDelete.isEmpty()">
+            DELETE FROM daily_diets
+            WHERE diet_plan_id = #{dietPlanId}
+            AND date IN
+            <foreach collection="datesToDelete" item="date" open="(" separator="," close=")">
+                #{date}
             </foreach>
-
+        </if>
     </delete>
 </mapper>

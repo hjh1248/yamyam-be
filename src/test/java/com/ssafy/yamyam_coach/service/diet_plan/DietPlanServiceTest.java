@@ -7,6 +7,7 @@ import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
 import com.ssafy.yamyam_coach.repository.user.UserRepository;
 import com.ssafy.yamyam_coach.service.diet_plan.request.CreateDietPlanServiceRequest;
+import com.ssafy.yamyam_coach.service.diet_plan.request.UpdateDietPlanServiceRequest;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -419,24 +420,253 @@ class DietPlanServiceTest extends IntegrationTestSupport {
                 // then
                 assertThat(primaryDietPlan.getDietPlanId()).isEqualTo(savedDietPlanId);
             }
-        }
 
-        @Nested
-        @DisplayName("실패 케이스")
-        class FailureCase {
-
-            @DisplayName("사용자 대표 식단이 없을 경우 NOT_FOUND_PRIMARY_DIET_PLAN 예외가 발생한다.")
+            @DisplayName("사용자 대표 식단이 없을 경우 빈 대표식단이 반환된다.")
             @Test
             void notExistsPrimaryDietPlan() {
                 // given
                 User user = createDummyUser();
                 userRepository.save(user);
 
-                // when // then
-                assertThatThrownBy(() -> dietPlanService.getPrimaryDietPlan(user.getId()))
-                        .isInstanceOf(DietPlanException.class)
-                        .hasMessage("사용자의 대표 식단을 찾을 수 없습니다");
+                //when
+                DietPlanServiceResponse primaryDietPlan = dietPlanService.getPrimaryDietPlan(user.getId());
+
+                //then
+                assertThat(primaryDietPlan.getDietPlanId()).isNull();
+                assertThat(primaryDietPlan.getTitle()).isEqualTo(null);
+                assertThat(primaryDietPlan.getContent()).isEqualTo(null);
+                assertThat(primaryDietPlan.getStartDate()).isNull();
+                assertThat(primaryDietPlan.getEndDate()).isNull();
+                assertThat(primaryDietPlan.isPrimary()).isFalse();
             }
         }
+    }
+
+    @Nested
+    @DisplayName("updateDietPlan")
+    class UpdateDietPlan {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        class SuccessCase {
+
+            @DisplayName("Content 필드만 업데이트 할 수 있다. (Partial Update)")
+            @Test
+            void updateOnlyContent() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                LocalDate originalStart = LocalDate.of(2025, 1, 1);
+                LocalDate originalEnd = LocalDate.of(2025, 1, 10);
+
+                // 기존 식단 계획 생성
+                CreateDietPlanServiceRequest originalRequest = CreateDietPlanServiceRequest.builder()
+                        .title("title")
+                        .content("Old Content")
+                        .startDate(originalStart)
+                        .endDate(originalEnd)
+                        .build();
+                Long dietPlanId = dietPlanService.registerDietPlan(user.getId(), originalRequest);
+
+                // 업데이트 요청: Content만 변경하고 나머지 필드는 null (PATCH 특성)
+                String newContent = "New Content Updated";
+                UpdateDietPlanServiceRequest request = createUpdateRequest(dietPlanId, newContent, null, null);
+
+                // when
+                dietPlanService.updateDietPlan(user.getId(), request);
+                DietPlan findDietPlan = dietPlanRepository.findById(dietPlanId).orElseThrow();
+
+                // then
+                // 1. Content만 변경되었는지 확인
+                assertThat(findDietPlan.getContent()).isEqualTo(newContent);
+                // 2. 날짜는 기존 값 그대로 유지되었는지 확인
+                assertThat(findDietPlan.getStartDate()).isEqualTo(originalStart);
+                assertThat(findDietPlan.getEndDate()).isEqualTo(originalEnd);
+            }
+
+            @DisplayName("날짜 범위만 업데이트 할 수 있다.")
+            @Test
+            void updateOnlyDatesAndCheckDailyDietDeletion() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                LocalDate originalStart = LocalDate.of(2025, 1, 1);
+                LocalDate originalEnd = LocalDate.of(2025, 1, 10);
+
+                CreateDietPlanServiceRequest originalRequest = CreateDietPlanServiceRequest.builder()
+                        .title("title")
+                        .content("Content")
+                        .startDate(originalStart)
+                        .endDate(originalEnd)
+                        .build();
+                Long dietPlanId = dietPlanService.registerDietPlan(user.getId(), originalRequest);
+
+                LocalDate newStart = LocalDate.of(2025, 1, 5);
+                LocalDate newEnd = LocalDate.of(2025, 1, 15);
+
+                UpdateDietPlanServiceRequest request = createUpdateRequest(dietPlanId, null, newStart, newEnd);
+
+                // when
+                dietPlanService.updateDietPlan(user.getId(), request);
+                DietPlan findDietPlan = dietPlanRepository.findById(dietPlanId).orElseThrow();
+
+                // then
+                assertThat(findDietPlan.getContent()).isEqualTo("Content");
+                assertThat(findDietPlan.getStartDate()).isEqualTo(newStart);
+                assertThat(findDietPlan.getEndDate()).isEqualTo(newEnd);
+            }
+
+            @DisplayName("날짜와 Content 필드를 동시에 업데이트 할 수 있다.")
+            @Test
+            void updateAllFields() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                CreateDietPlanServiceRequest originalRequest = CreateDietPlanServiceRequest.builder()
+                        .title("title")
+                        .content("Old Content")
+                        .startDate(LocalDate.of(2025, 1, 1))
+                        .endDate(LocalDate.of(2025, 1, 10))
+                        .build();
+                Long dietPlanId = dietPlanService.registerDietPlan(user.getId(), originalRequest);
+
+                String newContent = "New Content";
+                LocalDate newStart = LocalDate.of(2025, 2, 1);
+                LocalDate newEnd = LocalDate.of(2025, 2, 28);
+                UpdateDietPlanServiceRequest request = createUpdateRequest(dietPlanId, newContent, newStart, newEnd);
+
+                // when
+                dietPlanService.updateDietPlan(user.getId(), request);
+                DietPlan findDietPlan = dietPlanRepository.findById(dietPlanId).orElseThrow();
+
+                // then
+                assertThat(findDietPlan.getContent()).isEqualTo(newContent);
+                assertThat(findDietPlan.getStartDate()).isEqualTo(newStart);
+                assertThat(findDietPlan.getEndDate()).isEqualTo(newEnd);
+            }
+
+            @DisplayName("변경 사항이 없으면 DB 업데이트 없이 바로 return 한다.")
+            @Test
+            void returnImmediatelyWhenNoChange() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                String content = "Original Content";
+                LocalDate start = LocalDate.of(2025, 3, 1);
+                LocalDate end = LocalDate.of(2025, 3, 10);
+
+                CreateDietPlanServiceRequest originalRequest = CreateDietPlanServiceRequest.builder()
+                        .title("title")
+                        .content(content)
+                        .startDate(start)
+                        .endDate(end)
+                        .build();
+                Long dietPlanId = dietPlanService.registerDietPlan(user.getId(), originalRequest);
+
+                UpdateDietPlanServiceRequest request = createUpdateRequest(dietPlanId, content, start, end);
+
+                // when
+                dietPlanService.updateDietPlan(user.getId(), request);
+
+                // then
+                DietPlan findDietPlan = dietPlanRepository.findById(dietPlanId).orElse(null);
+                assertThat(findDietPlan).isNotNull();
+                assertThat(findDietPlan.getContent()).isEqualTo(content);
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        class FailureCase {
+
+            @DisplayName("존재하지 않는 DietPlan ID로 업데이트 시도시 NOT_FOUND_DIET_PLAN 예외가 발생한다.")
+            @Test
+            void notFoundDietPlan() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                Long notExistsDietPlanId = 999999L;
+                UpdateDietPlanServiceRequest request = createUpdateRequest(notExistsDietPlanId, "Content", null, null);
+
+                // when //then
+                assertThatThrownBy(() -> dietPlanService.updateDietPlan(user.getId(), request))
+                        .isInstanceOf(DietPlanException.class)
+                        .hasMessage("해당 식단 계획을 조회할 수 없습니다.");
+            }
+
+            @DisplayName("다른 사용자의 DietPlan 업데이트 시도시 UNAUTHORIZED 예외가 발생한다.")
+            @Test
+            void unauthorizedDietPlan() {
+                // given
+                User user = createDummyUser(); // 요청자
+                userRepository.save(user);
+
+                User other = createUser("other", "other nickname", "다른사람@test.com", "password");
+                userRepository.save(other);
+
+                CreateDietPlanServiceRequest originalRequest = CreateDietPlanServiceRequest.builder()
+                        .title("title")
+                        .content("Old Content")
+                        .startDate(LocalDate.now())
+                        .endDate(LocalDate.now().plusDays(1))
+                        .build();
+                Long othersDietPlanId = dietPlanService.registerDietPlan(other.getId(), originalRequest);
+
+                UpdateDietPlanServiceRequest request = createUpdateRequest(othersDietPlanId, "New Content", null, null);
+
+                // when //then
+                // 다른 사용자 ID로 업데이트 시도
+                assertThatThrownBy(() -> dietPlanService.updateDietPlan(user.getId(), request))
+                        .isInstanceOf(DietPlanException.class)
+                        .hasMessage("식단 계획 삭제 권한이 없습니다."); // 예외 메시지 확인
+            }
+
+            @DisplayName("날짜 변경 시 DailyDiet 정리 로직에서 NPE가 발생하지 않는지 확인한다.")
+            @Test
+            void dateDeletionNpePrevention() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                CreateDietPlanServiceRequest originalRequest = CreateDietPlanServiceRequest.builder()
+                        .title("title")
+                        .content("Content")
+                        .startDate(LocalDate.of(2025, 1, 1))
+                        .endDate(LocalDate.of(2025, 1, 10))
+                        .build();
+                Long dietPlanId = dietPlanService.registerDietPlan(user.getId(), originalRequest);
+
+                // 업데이트 요청: StartDate만 변경하고 EndDate는 null로 보냄 (NPE 발생 위험 시나리오)
+                LocalDate newStart = LocalDate.of(2025, 1, 5);
+
+                // Content도 변경 요청 (로직 실행을 강제하기 위해)
+                UpdateDietPlanServiceRequest request = createUpdateRequest(dietPlanId, "New Content", newStart, null);
+
+                // when
+                dietPlanService.updateDietPlan(user.getId(), request);
+
+                DietPlan findDietPlan = dietPlanRepository.findById(dietPlanId).orElse(null);
+
+                //then
+                assertThat(findDietPlan).isNotNull();
+                assertThat(findDietPlan.getContent()).isEqualTo("New Content");
+                assertThat(findDietPlan.getStartDate()).isEqualTo(newStart);
+                assertThat(findDietPlan.getEndDate()).isEqualTo(LocalDate.of(2025, 1, 10));
+            }
+        }
+    }
+
+    private UpdateDietPlanServiceRequest createUpdateRequest(Long dietPlanId, String content, LocalDate startDate, LocalDate endDate) {
+        return UpdateDietPlanServiceRequest.builder()
+                .dietPlanId(dietPlanId)
+                .content(content)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
     }
 }
