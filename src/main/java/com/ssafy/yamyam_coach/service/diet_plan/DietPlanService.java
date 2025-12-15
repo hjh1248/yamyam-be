@@ -117,12 +117,14 @@ public class DietPlanService {
         LocalDate startDate = request.getStartDate() == null ? dietPlan.getStartDate() : request.getStartDate();
         LocalDate endDate = request.getEndDate() == null ? dietPlan.getEndDate() : request.getEndDate();
 
-        long duration = java.time.temporal.ChronoUnit.DAYS.between(startDate, endDate) + 1;
+        long duration = java.time.temporal.ChronoUnit.DAYS.between(dietPlan.getStartDate(), dietPlan.getEndDate()) + 1;
 
         List<LocalDate> datesToDelete = Stream.iterate(dietPlan.getStartDate(), d -> d.plusDays(1))
                 .limit(duration)
                 .filter(d -> d.isBefore(startDate) || d.isAfter(endDate))
                 .toList();
+
+        log.debug("target for delete = {}", datesToDelete);
 
         // 7. batch delete
         dailyDietRepository.deleteByDietPlanAndDateInBatch(dietPlan.getId(), datesToDelete);
