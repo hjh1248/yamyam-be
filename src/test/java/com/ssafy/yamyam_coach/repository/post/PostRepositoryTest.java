@@ -306,4 +306,85 @@ class PostRepositoryTest extends IntegrationTestSupport {
                 .containsExactly(comment3.getId(), comment2.getId(), comment1.getId());
     }
 
+    @DisplayName("post 상세 조회시 댓글이 없으면 빈 리스트가 반환된다.")
+    @Test
+    void findPostDetailWithEmptyComments() {
+        // given
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+        dietPlanRepository.insert(dietPlan);
+
+        Post post = createDummyPost(user.getId(), dietPlan.getId());
+        postRepository.insert(post);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime next = now.plusDays(1);
+        LocalDateTime end = next.plusDays(1);
+
+        //when
+        PostDetailResponse detail = postRepository.findPostDetail(post.getId()).orElse(null);
+
+        //then
+        assertThat(detail).isNotNull();
+        assertThat(detail.getPostId()).isEqualTo(post.getId());
+        assertThat(detail.getTitle()).isEqualTo(post.getTitle());
+        assertThat(detail.getContent()).isEqualTo(post.getContent());
+        assertThat(detail.getAuthor().getUserId()).isEqualTo(user.getId());
+        assertThat(detail.getAuthor().getNickname()).isEqualTo(user.getNickname());
+
+        DietPlanDetailResponse dietPlanDetail = detail.getDietPlan();
+        assertThat(dietPlanDetail.getTitle()).isEqualTo(dietPlan.getTitle());
+        assertThat(dietPlanDetail.getDietPlanId()).isEqualTo(post.getDietPlanId());
+        assertThat(dietPlanDetail.getStartDate()).isEqualTo(dietPlan.getStartDate());
+        assertThat(dietPlanDetail.getEndDate()).isEqualTo(dietPlan.getEndDate());
+
+        List<CommentDetailResponse> comments = detail.getComments();
+        assertThat(comments).isEmpty();
+    }
+
+    @DisplayName("post 상세 조회시 연관 식단이 없을 경우 dietplan 은 null 이다.")
+    @Test
+    void findPostDetailWithEmptyDietPlan() {
+        // given
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        Post post = createDummyPost(user.getId(), null);
+        postRepository.insert(post);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime next = now.plusDays(1);
+        LocalDateTime end = next.plusDays(1);
+
+        Comment comment1 = createComment(user.getId(), post.getId(), "test1", now);
+        commentRepository.insert(comment1);
+
+        Comment comment2 = createComment(user.getId(), post.getId(), "test2", next);
+        commentRepository.insert(comment2);
+
+        Comment comment3 = createComment(user.getId(), post.getId(), "test3", end);
+        commentRepository.insert(comment3);
+
+        //when
+        PostDetailResponse detail = postRepository.findPostDetail(post.getId()).orElse(null);
+
+        //then
+        assertThat(detail).isNotNull();
+        assertThat(detail.getPostId()).isEqualTo(post.getId());
+        assertThat(detail.getTitle()).isEqualTo(post.getTitle());
+        assertThat(detail.getContent()).isEqualTo(post.getContent());
+        assertThat(detail.getAuthor().getUserId()).isEqualTo(user.getId());
+        assertThat(detail.getAuthor().getNickname()).isEqualTo(user.getNickname());
+
+        DietPlanDetailResponse dietPlanDetail = detail.getDietPlan();
+        assertThat(dietPlanDetail).isNull();
+
+        List<CommentDetailResponse> comments = detail.getComments();
+        assertThat(comments).hasSize(3)
+                .extracting(CommentDetailResponse::getCommentId)
+                .containsExactly(comment3.getId(), comment2.getId(), comment1.getId());
+    }
+
 }
