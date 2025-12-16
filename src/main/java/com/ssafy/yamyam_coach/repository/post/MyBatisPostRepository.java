@@ -3,6 +3,7 @@ package com.ssafy.yamyam_coach.repository.post;
 import com.ssafy.yamyam_coach.domain.post.Post;
 import com.ssafy.yamyam_coach.mapper.post.PostMapper;
 import com.ssafy.yamyam_coach.repository.post.request.UpdatePostRepositoryRequest;
+import com.ssafy.yamyam_coach.repository.post.response.PostDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -32,5 +33,10 @@ public class MyBatisPostRepository implements PostRepository {
     @Override
     public int deleteById(Long postId) {
         return postMapper.deleteById(postId);
+    }
+
+    @Override
+    public Optional<PostDetailResponse> findPostDetail(Long postId) {
+        return Optional.ofNullable(postMapper.findPostDetail(postId));
     }
 }

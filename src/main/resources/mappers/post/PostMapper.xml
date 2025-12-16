@@ -4,6 +4,71 @@
 
 <mapper namespace="com.ssafy.yamyam_coach.mapper.post.PostMapper">
 
+    <resultMap id="PostDetailMap" type="com.ssafy.yamyam_coach.repository.post.response.PostDetailResponse">
+        <id property="postId" column="post_id"/>
+        <result property="title" column="post_title"/>
+        <result property="content" column="post_content"/>
+        <result property="createdAt" column="post_created_at"/>
+
+        <association property="author" javaType="com.ssafy.yamyam_coach.repository.post.response.UserDetailResponse">
+            <id property="userId" column="post_author_id"/>
+            <result property="nickname" column="post_author_nickname"/>
+        </association>
+
+        <association property="dietPlan"
+                     javaType="com.ssafy.yamyam_coach.repository.post.response.DietPlanDetailResponse">
+            <id property="dietPlanId" column="diet_id"/>
+            <result property="title" column="diet_title"/>
+            <result property="startDate" column="diet_start_date"/>
+            <result property="endDate" column="diet_end_date"/>
+        </association>
+
+        <collection property="comments" ofType="com.ssafy.yamyam_coach.repository.post.response.CommentDetailResponse">
+            <id property="commentId" column="comment_id"/>
+            <result property="content" column="comment_content"/>
+            <result property="createdAt" column="comment_created_at"/>
+            <association property="author"
+                         javaType="com.ssafy.yamyam_coach.repository.post.response.UserDetailResponse">
+                <id property="userId" column="comment_author_id"/>
+                <result property="nickname" column="comment_author_nickname"/>
+            </association>
+        </collection>
+    </resultMap>
+
+    <select id="findPostDetail" resultMap="PostDetailMap">
+        SELECT p.id          AS post_id,
+               p.title       AS post_title,
+               p.content     AS post_content,
+               p.created_at  AS post_created_at, -- 콤마 추가됨
+
+               -- 게시글 작성자
+               p_u.id        AS post_author_id,
+               p_u.nickname  AS post_author_nickname,
+
+               -- 식단
+               dp.id         AS diet_id,
+               dp.title      AS diet_title,
+               dp.start_date AS diet_start_date,
+               dp.end_date   AS diet_end_date,
+
+               -- 댓글
+               c.id          AS comment_id,
+               c.content     AS comment_content,
+               c.created_at  AS comment_created_at,
+
+               -- 댓글 작성자
+               c_u.id        AS comment_author_id,
+               c_u.nickname  AS comment_author_nickname
+
+        FROM posts p
+                 JOIN users p_u ON p.user_id = p_u.id
+                 LEFT JOIN diet_plans dp ON p.diet_plan_id = dp.id
+                 LEFT JOIN comments c ON p.id = c.post_id
+                 LEFT JOIN users c_u ON c.user_id = c_u.id
+        WHERE p.id = #{postId}
+        ORDER BY c.created_at DESC
+    </select>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO posts (diet_plan_id, user_id, title, content, copy_count, like_count, created_at, updated_at)
         VALUES (#{dietPlanId}, #{userId}, #{title}, #{content}, #{copyCount}, #{likeCount}, #{createdAt}, #{updatedAt})
