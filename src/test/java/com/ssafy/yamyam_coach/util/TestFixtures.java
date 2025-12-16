@@ -7,6 +7,7 @@ import com.ssafy.yamyam_coach.domain.food.Food;
 import com.ssafy.yamyam_coach.domain.mealfood.MealFood;
 import com.ssafy.yamyam_coach.domain.meals.Meal;
 import com.ssafy.yamyam_coach.domain.meals.MealType;
+import com.ssafy.yamyam_coach.domain.post.Post;
 import com.ssafy.yamyam_coach.domain.user.User;
 
 import java.time.LocalDate;
@@ -151,6 +152,19 @@ public abstract class TestFixtures {
                 createFood("초코우유", "유제품", BaseUnit.ml,
                         75.0, 2.8, 2.5, 11.2, 10.8, 55.0, 10.0, 1.5, 0.0)
         );
+    }
+
+    public static Post createDummyPost(Long userId, Long dietPlanId) {
+        return Post.builder()
+                .userId(userId)
+                .dietPlanId(dietPlanId)
+                .title("title")
+                .content("content")
+                .likeCount(0)
+                .copyCount(0)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
     }
 
 }

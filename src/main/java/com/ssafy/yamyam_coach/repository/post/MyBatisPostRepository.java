@@ -1,0 +1,36 @@
+package com.ssafy.yamyam_coach.repository.post;
+
+import com.ssafy.yamyam_coach.domain.post.Post;
+import com.ssafy.yamyam_coach.mapper.post.PostMapper;
+import com.ssafy.yamyam_coach.repository.post.request.UpdatePostRepositoryRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+@RequiredArgsConstructor
+public class MyBatisPostRepository implements PostRepository {
+
+    private final PostMapper postMapper;
+
+    @Override
+    public int insert(Post post) {
+        return postMapper.insert(post);
+    }
+
+    @Override
+    public Optional<Post> findById(Long postId) {
+        return Optional.ofNullable(postMapper.findById(postId));
+    }
+
+    @Override
+    public int update(UpdatePostRepositoryRequest request) {
+        return postMapper.update(request);
+    }
+
+    @Override
+    public int deleteById(Long postId) {
+        return postMapper.deleteById(postId);
+    }
+}

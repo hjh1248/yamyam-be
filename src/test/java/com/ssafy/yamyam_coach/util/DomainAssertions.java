@@ -5,6 +5,7 @@ import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.food.Food;
 import com.ssafy.yamyam_coach.domain.mealfood.MealFood;
 import com.ssafy.yamyam_coach.domain.meals.Meal;
+import com.ssafy.yamyam_coach.domain.post.Post;
 import com.ssafy.yamyam_coach.domain.user.User;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,5 +66,16 @@ public abstract class DomainAssertions {
         assertThat(actual.getMealId()).isEqualTo(expected.getMealId());
         assertThat(actual.getFoodId()).isEqualTo(expected.getFoodId());
         assertThat(actual.getQuantity()).isEqualTo(expected.getQuantity());
+    }
+
+    // Post Assertions
+    public static void assertPostEquals(Post actual, Post expected) {
+        assertThat(actual).isNotNull();
+        assertThat(actual.getTitle()).isEqualTo(expected.getTitle());
+        assertThat(actual.getContent()).isEqualTo(expected.getContent());
+        assertThat(actual.getUserId()).isEqualTo(expected.getUserId());
+        assertThat(actual.getDietPlanId()).isEqualTo(expected.getDietPlanId());
+        assertThat(actual.getLikeCount()).isEqualTo(expected.getLikeCount());
+        assertThat(actual.getCopyCount()).isEqualTo(expected.getCopyCount());
     }
 }

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.yamyam_coach.mapper.post.PostMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts (diet_plan_id, user_id, title, content, copy_count, like_count, created_at, updated_at)
+        VALUES (#{dietPlanId}, #{userId}, #{title}, #{content}, #{copyCount}, #{likeCount}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <select id="findById">
+        SELECT *
+        FROM posts
+        WHERE id = #{postId}
+
+    </select>
+
+    <update id="update" parameterType="com.ssafy.yamyam_coach.repository.post.request.UpdatePostRepositoryRequest">
+        UPDATE posts
+        <set>
+            <choose>
+                <when test="dietPlanId == -1">
+                    diet_plan_id = NULL,
+                </when>
+                <when test="dietPlanId != null">
+                    diet_plan_id = #{dietPlanId},
+                </when>
+            </choose>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+        </set>
+        where id = #{postId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE
+        FROM posts
+        WHERE id = #{postId}
+    </delete>
+
+</mapper>
+
