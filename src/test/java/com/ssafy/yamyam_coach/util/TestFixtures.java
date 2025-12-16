@@ -1,5 +1,6 @@
 package com.ssafy.yamyam_coach.util;
 
+import com.ssafy.yamyam_coach.domain.comment.Comment;
 import com.ssafy.yamyam_coach.domain.daily_diet.DailyDiet;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.food.BaseUnit;
@@ -163,6 +164,26 @@ public abstract class TestFixtures {
                 .likeCount(0)
                 .copyCount(0)
                 .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static Comment createComment(Long userId, Long PostId, String content) {
+        return Comment.builder()
+                .userId(userId)
+                .postId(PostId)
+                .content(content)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static Comment createComment(Long userId, Long PostId, String content, LocalDateTime createdAt) {
+        return Comment.builder()
+                .userId(userId)
+                .postId(PostId)
+                .content(content)
+                .createdAt(createdAt)
                 .updatedAt(LocalDateTime.now())
                 .build();
     }

@@ -1,6 +1,7 @@
 package com.ssafy.yamyam_coach.repository.post;
 
 import com.ssafy.yamyam_coach.IntegrationTestSupport;
+import com.ssafy.yamyam_coach.domain.comment.Comment;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.post.Post;
 import com.ssafy.yamyam_coach.domain.user.User;
@@ -221,6 +222,29 @@ class PostRepositoryTest extends IntegrationTestSupport {
         assertThat(findPost.getUserId()).isEqualTo(user.getId());
         assertThat(findPost.getDietPlanId()).isEqualTo(dietPlan2.getId());
         assertThat(findPost.getContent()).isEqualTo(newContent);
+    }
+
+    @DisplayName("post 를 삭제할 수 있다.")
+    @Test
+    void deleteById() {
+        // given
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+        dietPlanRepository.insert(dietPlan);
+
+        Post post = createDummyPost(user.getId(), dietPlan.getId());
+        postRepository.insert(post);
+
+
+        // when
+        int deleteCount = postRepository.deleteById(post.getId());
+        Post findPost = postRepository.findById(post.getId()).orElse(null);
+
+        //then
+        assertThat(deleteCount).isEqualTo(1);
+        assertThat(findPost).isNull();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.ssafy.yamyam_coach.util;
 
+import com.ssafy.yamyam_coach.domain.comment.Comment;
 import com.ssafy.yamyam_coach.domain.daily_diet.DailyDiet;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.food.Food;
@@ -77,5 +78,12 @@ public abstract class DomainAssertions {
         assertThat(actual.getDietPlanId()).isEqualTo(expected.getDietPlanId());
         assertThat(actual.getLikeCount()).isEqualTo(expected.getLikeCount());
         assertThat(actual.getCopyCount()).isEqualTo(expected.getCopyCount());
+    }
+
+    public static void assertCommentEquals(Comment actual, Comment expected) {
+        assertThat(actual).isNotNull();
+        assertThat(actual.getUserId()).isEqualTo(expected.getUserId());
+        assertThat(actual.getPostId()).isEqualTo(expected.getPostId());
+        assertThat(actual.getContent()).isEqualTo(expected.getContent());
     }
 }
