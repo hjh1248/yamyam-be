@@ -78,7 +78,13 @@
         SELECT *
         FROM posts
         WHERE id = #{postId}
+    </select>
 
+    <select id="findByIdForUpdate">
+        SELECT *
+        FROM posts
+        WHERE id = #{postId}
+        FOR UPDATE
     </select>
 
     <update id="update" parameterType="com.ssafy.yamyam_coach.repository.post.request.UpdatePostRepositoryRequest">

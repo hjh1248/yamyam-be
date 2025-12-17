@@ -19,4 +19,6 @@ public interface PostMapper {
     PostDetailResponse findPostDetail(Long postId);
 
     int incrementLikeCount(Long postId);
+
+    Post findByIdForUpdate(Long postId);
 }

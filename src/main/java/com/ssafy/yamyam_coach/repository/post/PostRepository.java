@@ -19,4 +19,6 @@ public interface PostRepository {
     Optional<PostDetailResponse> findPostDetail(Long postId);
 
     int incrementLikeCount(Long postId);
+
+    Optional<Post> findByIdForUpdate(Long postId);
 }

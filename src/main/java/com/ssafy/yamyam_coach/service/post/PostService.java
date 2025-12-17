@@ -2,12 +2,14 @@ package com.ssafy.yamyam_coach.service.post;
 
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.post.Post;
+import com.ssafy.yamyam_coach.domain.postlike.PostLike;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
 import com.ssafy.yamyam_coach.exception.post.PostException;
 import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
 import com.ssafy.yamyam_coach.repository.post.PostRepository;
 import com.ssafy.yamyam_coach.repository.post.request.UpdatePostRepositoryRequest;
+import com.ssafy.yamyam_coach.repository.postlike.PostLikeRepository;
 import com.ssafy.yamyam_coach.service.post.request.CreatePostServiceRequest;
 import com.ssafy.yamyam_coach.service.post.request.UpdatePostServiceRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static com.ssafy.yamyam_coach.exception.post.PostErrorCode.NOT_FOUND_POST;
 
@@ -24,6 +27,7 @@ import static com.ssafy.yamyam_coach.exception.post.PostErrorCode.NOT_FOUND_POST
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
     private final DietPlanRepository dietPlanRepository;
 
     @Transactional
@@ -90,6 +94,31 @@ public class PostService {
         postRepository.deleteById(postId);
     }
 
+    @Transactional
+    public void likePost(Long currentUserId, Long postId) {
+
+        // 1. 해당 post 가 있는지 조회 후 존재 검증
+        Post post = postRepository.findByIdForUpdate(postId)
+                .orElseThrow(() -> new PostException(NOT_FOUND_POST));
+
+        // 2. 해당 post 에 이미 좋아요를 했는지 확인 -> 해당 post id 와 currentUserId 를 가진 post like 가 있는지 확인
+        Optional<PostLike> postLikeOpt = postLikeRepository.findByPostAndUser(post.getId(), currentUserId);
+
+        // 3. 이미 좋아요 한 이력이 있다면 return
+        if (postLikeOpt.isPresent()) {
+            return ;
+        }
+
+        // 4. 없다면 post like 생성
+        PostLike postLike = reatePostLike(currentUserId, postId);
+
+        // 5. post like 저장
+        postLikeRepository.insert(postLike);
+
+        // 6. post 의 like count + 1  -> db level 에서 원자적으로 해야 동시성 문제 발생 안함
+        postRepository.incrementLikeCount(postId);
+    }
+
     public Object getPostDetail() {
         return null;
     }
@@ -115,5 +144,13 @@ public class PostService {
 
     private static boolean isDietPlanUpdateRequired(UpdatePostServiceRequest request) {
         return request.getDietPlanId() != null && request.getDietPlanId() != -1;
+    }
+
+    private static PostLike reatePostLike(Long currentUserId, Long postId) {
+        return PostLike.builder()
+                .postId(postId)
+                .userId(currentUserId)
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 }

@@ -44,4 +44,9 @@ public class MyBatisPostRepository implements PostRepository {
     public int incrementLikeCount(Long postId) {
         return postMapper.incrementLikeCount(postId);
     }
+
+    @Override
+    public Optional<Post> findByIdForUpdate(Long postId) {
+        return Optional.ofNullable(postMapper.findByIdForUpdate(postId));
+    }
 }

@@ -22,6 +22,12 @@
           AND user_id = #{userId}
     </select>
 
+    <select id="findByPost" resultType="PostLike">
+        SELECT *
+        FROM post_likes
+        WHERE post_id = #{postId}
+    </select>
+
     <delete id="deleteByPostAndUser">
         DELETE
         FROM post_likes

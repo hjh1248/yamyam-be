@@ -3,11 +3,13 @@ package com.ssafy.yamyam_coach.service.post;
 import com.ssafy.yamyam_coach.IntegrationTestSupport;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.post.Post;
+import com.ssafy.yamyam_coach.domain.postlike.PostLike;
 import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
 import com.ssafy.yamyam_coach.exception.post.PostException;
 import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
 import com.ssafy.yamyam_coach.repository.post.PostRepository;
+import com.ssafy.yamyam_coach.repository.postlike.PostLikeRepository;
 import com.ssafy.yamyam_coach.repository.user.UserRepository;
 import com.ssafy.yamyam_coach.service.post.request.CreatePostServiceRequest;
 import com.ssafy.yamyam_coach.service.post.request.UpdatePostServiceRequest;
@@ -15,8 +17,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +44,9 @@ class PostServiceTest extends IntegrationTestSupport {
 
     @Autowired
     DietPlanRepository dietPlanRepository;
+
+    @Autowired
+    PostLikeRepository postLikeRepository;
 
     @Nested
     @DisplayName("createPost")
@@ -530,6 +542,107 @@ class PostServiceTest extends IntegrationTestSupport {
                 assertThatThrownBy(() -> postService.deletePost(user.getId(), othersPost.getId()))
                         .isInstanceOf(DietPlanException.class)
                         .hasMessage("해당 식단 계획으로 게시글과 관련된 작업을 할 수 없습니다.");
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("likePost")
+    class LikePost {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        class SuccessCase {
+
+            @DisplayName("post 에 대해 좋아요를 누를 경우 좋아요 수가 증가하고 like post 가 생성된다.")
+            @Test
+            void likePost() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                Post post = createDummyPost(user.getId(), null);
+                postRepository.insert(post);
+
+                // when
+                postService.likePost(user.getId(), post.getId());
+
+                Post findPost = postRepository.findById(post.getId()).orElse(null);
+                List<PostLike> postLikes = postLikeRepository.findByPost(post.getId());
+
+                // then
+                assertThat(findPost).isNotNull();
+                assertThat(findPost.getLikeCount()).isOne();
+                assertThat(postLikes).hasSize(1);
+            }
+
+            @DisplayName("post 에 대해 좋아요를 누를 경우 좋아요 수가 증가하고 like post 가 생성된다.")
+            @Test
+            @Transactional(propagation = Propagation.NOT_SUPPORTED)
+            void likePostInMultiThread() throws Exception {
+                // given
+                int threadCount = 100;
+                List<User> users = new ArrayList<>();
+                for (int i = 0; i < threadCount; i++) {
+                    User user = createUser("test"+i, "test"+i, "test"+i, "test"+i);
+                    userRepository.save(user);
+                    users.add(user);
+                }
+
+                Post post = createDummyPost(users.get(0).getId(), null);
+                postRepository.insert(post);
+
+                ExecutorService es = Executors.newFixedThreadPool(threadCount);
+                CountDownLatch latch = new CountDownLatch(threadCount);
+
+                // when
+                for (int i = 0; i < threadCount; i++) {
+                    final int index = i;
+                    es.execute(() -> {
+                        try {
+                            postService.likePost(users.get(index).getId(), post.getId());
+                        } finally {
+                            latch.countDown();
+                        }
+                    });
+                }
+
+                latch.await();
+
+                Post findPost = postRepository.findById(post.getId()).orElse(null);
+                List<PostLike> postLikes = postLikeRepository.findByPost(post.getId());
+
+                // then
+                assertThat(findPost).isNotNull();
+                assertThat(findPost.getLikeCount()).isEqualTo(threadCount);
+                assertThat(postLikes).hasSize(threadCount);
+
+                // cleansing
+                postRepository.deleteById(post.getId());
+                for (int i = 0; i < threadCount; i++) {
+                    userRepository.deleteById(users.get(i).getId());
+                }
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        class FailureCase {
+
+            @DisplayName("post 가 없다면 NOT_FOUND_POST 예외가 발생한다.")
+            @Test
+            void notFoundPost() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                Long notExistingPostId = 9999L;
+
+                // when // then
+                assertThatThrownBy(() -> postService.likePost(user.getId(),notExistingPostId))
+                        .isInstanceOf(PostException.class)
+                        .hasMessage("해당 게시글을 찾을 수 없습니다.");
+
             }
         }
     }

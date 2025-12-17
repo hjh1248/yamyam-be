@@ -5,6 +5,7 @@ import com.ssafy.yamyam_coach.mapper.postlike.PostLikeMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,6 +27,11 @@ public class MyBatisPostLikeRepository implements PostLikeRepository {
     @Override
     public Optional<PostLike> findByPostAndUser(Long postId, Long userId) {
         return Optional.ofNullable(postLikeMapper.findByPostAndUser(postId, userId));
+    }
+
+    @Override
+    public List<PostLike> findByPost(Long postId) {
+        return postLikeMapper.findByPost(postId);
     }
 
     @Override
