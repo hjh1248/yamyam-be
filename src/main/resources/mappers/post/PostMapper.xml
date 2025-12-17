@@ -108,5 +108,11 @@
         WHERE id = #{postId}
     </delete>
 
+    <update id="incrementLikeCount">
+        UPDATE posts
+        SET like_count = like_count + 1
+        WHERE id = #{postId}
+    </update>
+
 </mapper>
 

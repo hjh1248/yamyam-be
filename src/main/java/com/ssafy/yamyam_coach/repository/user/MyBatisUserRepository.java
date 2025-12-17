@@ -34,4 +34,10 @@ public class MyBatisUserRepository implements UserRepository {
     public boolean existsByNickname(String nickname) {
         return userMapper.existsByNickname(nickname);
     }
+
+    @Override
+    public int deleteById(Long userId) {
+        return userMapper.deleteById(userId);
+    }
+
 }

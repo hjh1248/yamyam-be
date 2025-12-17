@@ -16,11 +16,15 @@ import com.ssafy.yamyam_coach.util.DomainAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.ssafy.yamyam_coach.util.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -385,6 +389,55 @@ class PostRepositoryTest extends IntegrationTestSupport {
         assertThat(comments).hasSize(3)
                 .extracting(CommentDetailResponse::getCommentId)
                 .containsExactly(comment3.getId(), comment2.getId(), comment1.getId());
+    }
+
+    @Transactional(propagation =  Propagation.NOT_SUPPORTED)
+    @Test
+    @DisplayName("여러 사용자가 동시에 좋아요를 증가시킬 경우 정확한 개수가 반영된다.")
+    void incrementLikeCount() throws Exception {
+
+        // given
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+        dietPlanRepository.insert(dietPlan);
+
+        Post post = createDummyPost(user.getId(), dietPlan.getId());
+        postRepository.insert(post);
+
+        System.out.println("post id = " + post.getId());
+
+        int threadCount = 100;
+        ExecutorService es = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        // when
+        for (int i = 0; i < threadCount; i++) {
+            es.execute(() -> {
+                try {
+                    int deleteCount = postRepository.incrementLikeCount(post.getId());
+                    System.out.println("delete count: " + deleteCount);
+
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+        es.shutdown();
+
+        Post findPost = postRepository.findById(post.getId()).orElse(null);
+
+        //then
+        assertThat(findPost).isNotNull();
+        assertThat(findPost.getLikeCount()).isEqualTo(threadCount);
+
+        // cleansing
+        postRepository.deleteById(post.getId());
+        dietPlanRepository.deleteById(dietPlan.getId());
+        userRepository.deleteById(user.getId());
     }
 
 }

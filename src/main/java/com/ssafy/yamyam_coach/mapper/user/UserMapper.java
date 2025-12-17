@@ -17,4 +17,6 @@ public interface UserMapper {
     boolean existsByNickname(String nickname);
 
     User findById(Long userId);
+
+    int deleteById(Long userId);
 }
