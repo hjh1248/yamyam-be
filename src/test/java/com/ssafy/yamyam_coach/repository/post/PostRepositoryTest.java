@@ -416,9 +416,7 @@ class PostRepositoryTest extends IntegrationTestSupport {
         for (int i = 0; i < threadCount; i++) {
             es.execute(() -> {
                 try {
-                    int deleteCount = postRepository.incrementLikeCount(post.getId());
-                    System.out.println("delete count: " + deleteCount);
-
+                   postRepository.incrementLikeCount(post.getId());
                 } finally {
                     latch.countDown();
                 }
@@ -437,6 +435,102 @@ class PostRepositoryTest extends IntegrationTestSupport {
         // cleansing
         postRepository.deleteById(post.getId());
         dietPlanRepository.deleteById(dietPlan.getId());
+        userRepository.deleteById(user.getId());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @DisplayName("동시에 좋아요를 취소할 경우 누른 횟수만큼 좋아요가 감소해야 한다.")
+    void unlikePostInMultiThread() throws Exception {
+
+        //given
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+        dietPlanRepository.insert(dietPlan);
+
+        Post post = createDummyPost(user.getId(), dietPlan.getId());
+        postRepository.insert(post);
+
+        System.out.println("post id = " + post.getId());
+
+        for (int i = 0; i < 100; i++) {
+            postRepository.incrementLikeCount(post.getId());
+        }
+
+        int threadCount = 100;
+        ExecutorService es = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        // when
+        for (int i = 0; i < threadCount; i++) {
+            es.execute(() -> {
+                try {
+                     postRepository.decrementLikeCount(post.getId());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+        es.shutdown();
+
+        // then
+        Post findPost = postRepository.findById(post.getId()).orElseThrow();
+        assertThat(findPost.getLikeCount()).isEqualTo(0);
+
+        // cleansing
+        postRepository.deleteById(post.getId());
+        userRepository.deleteById(user.getId());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @DisplayName("좋아요 수는 음수가 될 수 없다.")
+    void minimumIsZero() throws Exception {
+
+        //given
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+        dietPlanRepository.insert(dietPlan);
+
+        Post post = createDummyPost(user.getId(), dietPlan.getId());
+        postRepository.insert(post);
+
+        System.out.println("post id = " + post.getId());
+
+        for (int i = 0; i < 10; i++) {
+            postRepository.incrementLikeCount(post.getId());
+        }
+
+        int threadCount = 100;
+        ExecutorService es = Executors.newFixedThreadPool(32);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        // when
+        for (int i = 0; i < threadCount; i++) {
+            es.execute(() -> {
+                try {
+                    postRepository.decrementLikeCount(post.getId());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+        es.shutdown();
+
+        // then
+        Post findPost = postRepository.findById(post.getId()).orElseThrow();
+        assertThat(findPost.getLikeCount()).isEqualTo(0);
+
+        // cleansing
+        postRepository.deleteById(post.getId());
         userRepository.deleteById(user.getId());
     }
 

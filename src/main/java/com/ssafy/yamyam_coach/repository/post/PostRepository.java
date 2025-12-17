@@ -21,4 +21,6 @@ public interface PostRepository {
     int incrementLikeCount(Long postId);
 
     Optional<Post> findByIdForUpdate(Long postId);
+
+    int decrementLikeCount(Long postId);
 }

@@ -21,4 +21,6 @@ public interface PostMapper {
     int incrementLikeCount(Long postId);
 
     Post findByIdForUpdate(Long postId);
+
+    int decrementLikeCount(Long postId);
 }

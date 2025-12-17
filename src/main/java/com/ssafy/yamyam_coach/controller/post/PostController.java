@@ -66,4 +66,11 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{postId}/unlike")
+    public ResponseEntity<Void> unlikePost(@LoginUser User currentUser, @PathVariable Long postId) {
+        Long currentUserId = currentUser.getId();
+        postService.unlikePost(currentUserId, postId);
+        return ResponseEntity.ok().build();
+    }
+
 }

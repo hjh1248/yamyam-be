@@ -120,5 +120,11 @@
         WHERE id = #{postId}
     </update>
 
+    <update id="decrementLikeCount">
+        UPDATE posts
+        SET like_count = like_count - 1
+        WHERE id = #{postId} AND like_count > 0
+    </update>
+
 </mapper>
 

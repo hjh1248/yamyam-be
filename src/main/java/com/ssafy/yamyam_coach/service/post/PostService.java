@@ -110,13 +110,34 @@ public class PostService {
         }
 
         // 4. 없다면 post like 생성
-        PostLike postLike = reatePostLike(currentUserId, postId);
+        PostLike postLike = createPostLike(currentUserId, postId);
 
         // 5. post like 저장
         postLikeRepository.insert(postLike);
 
         // 6. post 의 like count + 1  -> db level 에서 원자적으로 해야 동시성 문제 발생 안함
         postRepository.incrementLikeCount(postId);
+    }
+
+    @Transactional
+    public void unlikePost(Long currentUserId, Long postId) {
+        // 1. 해당 post 가 있는지 조회 후 존재 검증
+        Post post = postRepository.findByIdForUpdate(postId)
+                .orElseThrow(() -> new PostException(NOT_FOUND_POST));
+
+        // 2. 해당 post 에 이미 좋아요를 했는지 확인 -> 해당 post id 와 currentUserId 를 가진 post like 가 있는지 확인
+        Optional<PostLike> postLikeOpt = postLikeRepository.findByPostAndUser(post.getId(), currentUserId);
+
+        // 3. 좋아요 한 이력이 없을 경우 return
+        if (postLikeOpt.isEmpty()) {
+            return ;
+        }
+
+        // 4. post like 삭제
+        postLikeRepository.deleteByPostAndUser(postId, currentUserId);
+
+        // 6. post 의 like count - 1  -> db level 에서 원자적으로 해야 동시성 문제 발생 안함
+        postRepository.decrementLikeCount(postId);
     }
 
     public Object getPostDetail() {
@@ -146,7 +167,7 @@ public class PostService {
         return request.getDietPlanId() != null && request.getDietPlanId() != -1;
     }
 
-    private static PostLike reatePostLike(Long currentUserId, Long postId) {
+    private static PostLike createPostLike(Long currentUserId, Long postId) {
         return PostLike.builder()
                 .postId(postId)
                 .userId(currentUserId)

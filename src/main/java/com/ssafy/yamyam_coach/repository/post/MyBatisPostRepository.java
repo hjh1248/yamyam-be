@@ -49,4 +49,9 @@ public class MyBatisPostRepository implements PostRepository {
     public Optional<Post> findByIdForUpdate(Long postId) {
         return Optional.ofNullable(postMapper.findByIdForUpdate(postId));
     }
+
+    @Override
+    public int decrementLikeCount(Long postId) {
+        return postMapper.decrementLikeCount(postId);
+    }
 }
