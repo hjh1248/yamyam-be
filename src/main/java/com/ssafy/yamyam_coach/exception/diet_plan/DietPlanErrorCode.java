@@ -9,7 +9,7 @@ public enum DietPlanErrorCode implements CustomErrorCode {
     NOT_FOUND_DIET_PLAN("해당 식단 계획을 조회할 수 없습니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_PRIMARY_DIET_PLAN("사용자의 대표 식단을 찾을 수 없습니다",  HttpStatus.NOT_FOUND),
     UNAUTHORIZED_FOR_DELETE("식단 계획 삭제 권한이 없습니다.",  HttpStatus.FORBIDDEN),
-    UNAUTHORIZED_FOR_CREATE_POST("해당 식단 계획으로 게시글을 만들 수 없습니다.",  HttpStatus.FORBIDDEN),
+    UNAUTHORIZED_FOR_POST("해당 식단 계획으로 게시글과 관련된 작업을 할 수 없습니다.",  HttpStatus.FORBIDDEN),
     CANNOT_SET_AS_PRIMARY("해당 식단 계획을 대표 식단 계획으로 설정할 수 없습니다.",   HttpStatus.BAD_REQUEST),
     ;
 

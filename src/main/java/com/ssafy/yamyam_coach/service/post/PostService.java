@@ -96,7 +96,7 @@ public class PostService {
 
     private void validateUser(Long currentUserId, Long userId) {
         if (!currentUserId.equals(userId)) {
-            throw new DietPlanException(DietPlanErrorCode.UNAUTHORIZED_FOR_CREATE_POST);
+            throw new DietPlanException(DietPlanErrorCode.UNAUTHORIZED_FOR_POST);
         }
     }
 

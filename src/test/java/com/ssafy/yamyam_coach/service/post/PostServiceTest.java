@@ -125,7 +125,7 @@ class PostServiceTest extends IntegrationTestSupport {
                         .hasMessage("해당 식단 계획을 조회할 수 없습니다.");
             }
 
-            @DisplayName("다른 사용자의 dietPlan으로 생성 시도 시 UNAUTHORIZED_FOR_CREATE_POST 예외가 발생한다.")
+            @DisplayName("다른 사용자의 dietPlan으로 생성 시도 시 UNAUTHORIZED_FOR_POST 예외가 발생한다.")
             @Test
             void createPostWithOtherUsersDietPlan() {
                 // given
@@ -147,7 +147,7 @@ class PostServiceTest extends IntegrationTestSupport {
                 // when // then
                 assertThatThrownBy(() -> postService.createPost(user.getId(), request))
                         .isInstanceOf(DietPlanException.class)
-                        .hasMessage("해당 식단 계획으로 게시글을 만들 수 없습니다.");
+                        .hasMessage("해당 식단 계획으로 게시글과 관련된 작업을 할 수 없습니다.");
             }
         }
     }
@@ -364,7 +364,7 @@ class PostServiceTest extends IntegrationTestSupport {
                         .hasMessage("해당 게시글을 찾을 수 없습니다.");
             }
 
-            @DisplayName("다른 사용자의 post를 수정하려 할 때 UNAUTHORIZED_FOR_CREATE_POST 예외가 발생한다.")
+            @DisplayName("다른 사용자의 post를 수정하려 할 때 UNAUTHORIZED_FOR_POST 예외가 발생한다.")
             @Test
             void updateOtherUsersPost() {
                 // given
@@ -387,7 +387,7 @@ class PostServiceTest extends IntegrationTestSupport {
                 // when // then
                 assertThatThrownBy(() -> postService.updatePost(user.getId(), request))
                         .isInstanceOf(DietPlanException.class)
-                        .hasMessage("해당 식단 계획으로 게시글을 만들 수 없습니다.");
+                        .hasMessage("해당 식단 계획으로 게시글과 관련된 작업을 할 수 없습니다.");
             }
 
             @DisplayName("존재하지 않는 dietPlanId로 수정 시도 시 NOT_FOUND_DIET_PLAN 예외가 발생한다.")
@@ -415,7 +415,7 @@ class PostServiceTest extends IntegrationTestSupport {
                         .hasMessage("해당 식단 계획을 조회할 수 없습니다.");
             }
 
-            @DisplayName("다른 사용자의 dietPlan으로 수정 시도 시 UNAUTHORIZED_FOR_CREATE_POST 예외가 발생한다.")
+            @DisplayName("다른 사용자의 dietPlan으로 수정 시도 시 UNAUTHORIZED_FOR_POST 예외가 발생한다.")
             @Test
             void updateWithOtherUsersDietPlan() {
                 // given
@@ -441,7 +441,7 @@ class PostServiceTest extends IntegrationTestSupport {
                 // when // then
                 assertThatThrownBy(() -> postService.updatePost(user.getId(), request))
                         .isInstanceOf(DietPlanException.class)
-                        .hasMessage("해당 식단 계획으로 게시글을 만들 수 없습니다.");
+                        .hasMessage("해당 식단 계획으로 게시글과 관련된 작업을 할 수 없습니다.");
             }
         }
     }
@@ -513,7 +513,7 @@ class PostServiceTest extends IntegrationTestSupport {
                         .hasMessage("해당 게시글을 찾을 수 없습니다.");
             }
 
-            @DisplayName("다른 사용자의 post를 삭제하려 할 때 UNAUTHORIZED_FOR_CREATE_POST 예외가 발생한다.")
+            @DisplayName("다른 사용자의 post를 삭제하려 할 때 UNAUTHORIZED_FOR_POST 예외가 발생한다.")
             @Test
             void deleteOtherUsersPost() {
                 // given
@@ -529,7 +529,7 @@ class PostServiceTest extends IntegrationTestSupport {
                 // when // then
                 assertThatThrownBy(() -> postService.deletePost(user.getId(), othersPost.getId()))
                         .isInstanceOf(DietPlanException.class)
-                        .hasMessage("해당 식단 계획으로 게시글을 만들 수 없습니다.");
+                        .hasMessage("해당 식단 계획으로 게시글과 관련된 작업을 할 수 없습니다.");
             }
         }
     }
