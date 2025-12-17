@@ -16,7 +16,7 @@ public interface PostMapper {
 
     int deleteById(Long postId);
 
-    PostDetailResponse findPostDetail(Long postId);
+    PostDetailResponse findPostDetail(Long postId, Long userId);
 
     int incrementLikeCount(Long postId);
 

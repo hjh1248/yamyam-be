@@ -9,6 +9,7 @@ import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
 import com.ssafy.yamyam_coach.exception.post.PostException;
 import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
 import com.ssafy.yamyam_coach.repository.post.PostRepository;
+import com.ssafy.yamyam_coach.repository.post.response.PostDetailResponse;
 import com.ssafy.yamyam_coach.repository.postlike.PostLikeRepository;
 import com.ssafy.yamyam_coach.repository.user.UserRepository;
 import com.ssafy.yamyam_coach.service.post.request.CreatePostServiceRequest;
@@ -750,6 +751,175 @@ class PostServiceTest extends IntegrationTestSupport {
                         .isInstanceOf(PostException.class)
                         .hasMessage("해당 게시글을 찾을 수 없습니다.");
 
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("getPostDetail")
+    class GetPostDetail {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        class SuccessCase {
+
+            @DisplayName("post 상세 정보를 정상적으로 조회할 수 있다.")
+            @Test
+            void getPostDetail() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(7));
+                dietPlanRepository.insert(dietPlan);
+
+                Post post = createDummyPost(user.getId(), dietPlan.getId());
+                postRepository.insert(post);
+
+                // when
+                PostDetailResponse response = postService.getPostDetail(user.getId(), post.getId());
+
+                // then
+                assertThat(response).isNotNull();
+                assertThat(response.getPostId()).isEqualTo(post.getId());
+                assertThat(response.getTitle()).isEqualTo(post.getTitle());
+                assertThat(response.getContent()).isEqualTo(post.getContent());
+                assertThat(response.getLikeCount()).isEqualTo(0);
+                assertThat(response.getIsLiked()).isFalse();
+                assertThat(response.getAuthor().getUserId()).isEqualTo(user.getId());
+                assertThat(response.getDietPlan().getDietPlanId()).isEqualTo(dietPlan.getId());
+            }
+
+            @DisplayName("좋아요를 누른 post를 조회하면 isLiked가 true이고 좋아요 수가 증가한다.")
+            @Test
+            void getPostDetailWithLike() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                Post post = createDummyPost(user.getId(), null);
+                postRepository.insert(post);
+
+                // 좋아요 누르기
+                postService.likePost(user.getId(), post.getId());
+
+                // when
+                PostDetailResponse response = postService.getPostDetail(user.getId(), post.getId());
+
+                // then
+                assertThat(response).isNotNull();
+                assertThat(response.getPostId()).isEqualTo(post.getId());
+                assertThat(response.getIsLiked()).isTrue();
+                assertThat(response.getLikeCount()).isEqualTo(1);
+            }
+
+            @DisplayName("좋아요를 누르지 않은 post를 조회하면 isLiked가 false이고 좋아요 수가 0이다.")
+            @Test
+            void getPostDetailWithoutLike() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                Post post = createDummyPost(user.getId(), null);
+                postRepository.insert(post);
+
+                // when
+                PostDetailResponse response = postService.getPostDetail(user.getId(), post.getId());
+
+                // then
+                assertThat(response).isNotNull();
+                assertThat(response.getPostId()).isEqualTo(post.getId());
+                assertThat(response.getIsLiked()).isFalse();
+                assertThat(response.getLikeCount()).isEqualTo(0);
+            }
+
+            @DisplayName("로그인하지 않은 사용자(userId = null)가 좋아요가 있는 post를 조회하면 isLiked가 false이다.")
+            @Test
+            void getPostDetailWithNullUser() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                Post post = createDummyPost(user.getId(), null);
+                postRepository.insert(post);
+
+                // 다른 사용자가 좋아요 누르기
+                postService.likePost(user.getId(), post.getId());
+
+                // when
+                PostDetailResponse response = postService.getPostDetail(null, post.getId());
+
+                // then
+                assertThat(response).isNotNull();
+                assertThat(response.getPostId()).isEqualTo(post.getId());
+                assertThat(response.getIsLiked()).isFalse();
+                assertThat(response.getLikeCount()).isEqualTo(1);
+            }
+
+            @DisplayName("여러 사용자가 좋아요를 누른 post를 조회하면 전체 좋아요 수와 현재 사용자의 좋아요 여부를 확인할 수 있다.")
+            @Test
+            void getPostDetailWithMultipleLikes() {
+                // given
+                User user1 = createDummyUser();
+                userRepository.save(user1);
+
+                User user2 = createUser("다른사람", "다른닉네임", "other@test.com", "password");
+                userRepository.save(user2);
+
+                Post post = createDummyPost(user1.getId(), null);
+                postRepository.insert(post);
+
+                // user1, user2 모두 좋아요 누르기
+                postService.likePost(user1.getId(), post.getId());
+                postService.likePost(user2.getId(), post.getId());
+
+                // when - user1이 조회
+                PostDetailResponse response = postService.getPostDetail(user1.getId(), post.getId());
+
+                // then
+                assertThat(response).isNotNull();
+                assertThat(response.getPostId()).isEqualTo(post.getId());
+                assertThat(response.getIsLiked()).isTrue();  // user1은 좋아요 누름
+                assertThat(response.getLikeCount()).isEqualTo(2);  // 전체 좋아요 수는 2
+            }
+
+            @DisplayName("dietPlan이 없는 post도 정상적으로 조회할 수 있다.")
+            @Test
+            void getPostDetailWithoutDietPlan() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                Post post = createDummyPost(user.getId(), null);
+                postRepository.insert(post);
+
+                // when
+                com.ssafy.yamyam_coach.repository.post.response.PostDetailResponse response = postService.getPostDetail(user.getId(), post.getId());
+
+                // then
+                assertThat(response).isNotNull();
+                assertThat(response.getPostId()).isEqualTo(post.getId());
+                assertThat(response.getDietPlan()).isNull();
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        class FailureCase {
+
+            @DisplayName("존재하지 않는 post를 조회하려 할 때 NOT_FOUND_POST 예외가 발생한다.")
+            @Test
+            void getNotExistingPost() {
+                // given
+                User user = createDummyUser();
+                userRepository.save(user);
+
+                Long notExistingPostId = 99999L;
+
+                // when // then
+                assertThatThrownBy(() -> postService.getPostDetail(user.getId(), notExistingPostId))
+                        .isInstanceOf(PostException.class)
+                        .hasMessage("해당 게시글을 찾을 수 없습니다.");
             }
         }
     }

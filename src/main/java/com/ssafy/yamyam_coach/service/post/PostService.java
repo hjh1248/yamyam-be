@@ -9,6 +9,7 @@ import com.ssafy.yamyam_coach.exception.post.PostException;
 import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
 import com.ssafy.yamyam_coach.repository.post.PostRepository;
 import com.ssafy.yamyam_coach.repository.post.request.UpdatePostRepositoryRequest;
+import com.ssafy.yamyam_coach.repository.post.response.PostDetailResponse;
 import com.ssafy.yamyam_coach.repository.postlike.PostLikeRepository;
 import com.ssafy.yamyam_coach.service.post.request.CreatePostServiceRequest;
 import com.ssafy.yamyam_coach.service.post.request.UpdatePostServiceRequest;
@@ -140,8 +141,9 @@ public class PostService {
         postRepository.decrementLikeCount(postId);
     }
 
-    public Object getPostDetail() {
-        return null;
+    public PostDetailResponse getPostDetail(Long currentUserId, Long postId) {
+       return postRepository.findPostDetail(postId, currentUserId)
+               .orElseThrow(() -> new PostException(NOT_FOUND_POST));
     }
 
     private void validateUser(Long currentUserId, Long userId) {

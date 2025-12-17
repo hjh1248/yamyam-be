@@ -4,6 +4,7 @@ import com.ssafy.yamyam_coach.controller.post.request.CreatePostRequest;
 import com.ssafy.yamyam_coach.controller.post.request.UpdatePostRequest;
 import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.global.annotation.LoginUser;
+import com.ssafy.yamyam_coach.repository.post.response.PostDetailResponse;
 import com.ssafy.yamyam_coach.service.post.PostService;
 import com.ssafy.yamyam_coach.service.post.request.UpdatePostServiceRequest;
 import jakarta.validation.Valid;
@@ -33,6 +34,11 @@ public class PostController {
                 .toUri();
 
         return ResponseEntity.created(location).build();
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostDetailResponse> getPostDetail(@LoginUser User currentUser, @PathVariable Long postId) {
+        return ResponseEntity.ok(postService.getPostDetail(currentUser.getId(), postId));
     }
 
     @PatchMapping("/{postId}")

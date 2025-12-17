@@ -8,6 +8,8 @@
         <id property="postId" column="post_id"/>
         <result property="title" column="post_title"/>
         <result property="content" column="post_content"/>
+        <result property="likeCount" column="post_like_count"/>
+        <result property="isLiked" column="is_liked"/>
         <result property="createdAt" column="post_created_at"/>
 
         <association property="author" javaType="com.ssafy.yamyam_coach.repository.post.response.UserDetailResponse">
@@ -39,7 +41,9 @@
         SELECT p.id          AS post_id,
                p.title       AS post_title,
                p.content     AS post_content,
-               p.created_at  AS post_created_at, -- 콤마 추가됨
+               p.like_count  AS post_like_count,
+               CASE WHEN pl.id IS NOT NULL THEN TRUE ELSE FALSE END AS is_liked,
+               p.created_at  AS post_created_at,
 
                -- 게시글 작성자
                p_u.id        AS post_author_id,
@@ -65,6 +69,7 @@
                  LEFT JOIN diet_plans dp ON p.diet_plan_id = dp.id
                  LEFT JOIN comments c ON p.id = c.post_id
                  LEFT JOIN users c_u ON c.user_id = c_u.id
+                 LEFT JOIN post_likes pl ON p.id = pl.post_id AND pl.user_id = #{userId}
         WHERE p.id = #{postId}
         ORDER BY c.created_at DESC
     </select>

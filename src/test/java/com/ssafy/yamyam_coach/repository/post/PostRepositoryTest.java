@@ -4,6 +4,7 @@ import com.ssafy.yamyam_coach.IntegrationTestSupport;
 import com.ssafy.yamyam_coach.domain.comment.Comment;
 import com.ssafy.yamyam_coach.domain.dietplan.DietPlan;
 import com.ssafy.yamyam_coach.domain.post.Post;
+import com.ssafy.yamyam_coach.domain.postlike.PostLike;
 import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.repository.comment.CommentRepository;
 import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
@@ -42,6 +43,9 @@ class PostRepositoryTest extends IntegrationTestSupport {
 
     @Autowired
     CommentRepository commentRepository;
+
+    @Autowired
+    com.ssafy.yamyam_coach.repository.postlike.PostLikeRepository postLikeRepository;
 
     @DisplayName("post 를 저장할 수 있다.")
     @Test
@@ -288,13 +292,15 @@ class PostRepositoryTest extends IntegrationTestSupport {
         commentRepository.insert(comment3);
 
         //when
-        PostDetailResponse detail = postRepository.findPostDetail(post.getId()).orElse(null);
+        PostDetailResponse detail = postRepository.findPostDetail(post.getId(), user.getId()).orElse(null);
 
         //then
         assertThat(detail).isNotNull();
         assertThat(detail.getPostId()).isEqualTo(post.getId());
         assertThat(detail.getTitle()).isEqualTo(post.getTitle());
         assertThat(detail.getContent()).isEqualTo(post.getContent());
+        assertThat(detail.getLikeCount()).isEqualTo(0);
+        assertThat(detail.getIsLiked()).isFalse();
         assertThat(detail.getAuthor().getUserId()).isEqualTo(user.getId());
         assertThat(detail.getAuthor().getNickname()).isEqualTo(user.getNickname());
 
@@ -328,13 +334,15 @@ class PostRepositoryTest extends IntegrationTestSupport {
         LocalDateTime end = next.plusDays(1);
 
         //when
-        PostDetailResponse detail = postRepository.findPostDetail(post.getId()).orElse(null);
+        PostDetailResponse detail = postRepository.findPostDetail(post.getId(), user.getId()).orElse(null);
 
         //then
         assertThat(detail).isNotNull();
         assertThat(detail.getPostId()).isEqualTo(post.getId());
         assertThat(detail.getTitle()).isEqualTo(post.getTitle());
         assertThat(detail.getContent()).isEqualTo(post.getContent());
+        assertThat(detail.getLikeCount()).isEqualTo(0);
+        assertThat(detail.getIsLiked()).isFalse();
         assertThat(detail.getAuthor().getUserId()).isEqualTo(user.getId());
         assertThat(detail.getAuthor().getNickname()).isEqualTo(user.getNickname());
 
@@ -372,13 +380,15 @@ class PostRepositoryTest extends IntegrationTestSupport {
         commentRepository.insert(comment3);
 
         //when
-        PostDetailResponse detail = postRepository.findPostDetail(post.getId()).orElse(null);
+        PostDetailResponse detail = postRepository.findPostDetail(post.getId(), user.getId()).orElse(null);
 
         //then
         assertThat(detail).isNotNull();
         assertThat(detail.getPostId()).isEqualTo(post.getId());
         assertThat(detail.getTitle()).isEqualTo(post.getTitle());
         assertThat(detail.getContent()).isEqualTo(post.getContent());
+        assertThat(detail.getLikeCount()).isEqualTo(0);
+        assertThat(detail.getIsLiked()).isFalse();
         assertThat(detail.getAuthor().getUserId()).isEqualTo(user.getId());
         assertThat(detail.getAuthor().getNickname()).isEqualTo(user.getNickname());
 
@@ -532,6 +542,88 @@ class PostRepositoryTest extends IntegrationTestSupport {
         // cleansing
         postRepository.deleteById(post.getId());
         userRepository.deleteById(user.getId());
+    }
+
+    @DisplayName("사용자가 좋아요를 누른 게시글을 조회하면 isLiked가 true이다.")
+    @Test
+    void findPostDetailWithLike() {
+        // given
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+        dietPlanRepository.insert(dietPlan);
+
+        Post post = createDummyPost(user.getId(), dietPlan.getId());
+        postRepository.insert(post);
+
+        // 좋아요 추가
+        PostLike postLike = PostLike.builder()
+                .postId(post.getId())
+                .userId(user.getId())
+                .createdAt(java.time.LocalDateTime.now())
+                .build();
+        postLikeRepository.insert(postLike);
+
+        // when
+        PostDetailResponse detail = postRepository.findPostDetail(post.getId(), user.getId()).orElse(null);
+
+        // then
+        assertThat(detail).isNotNull();
+        assertThat(detail.getIsLiked()).isTrue();
+        assertThat(detail.getLikeCount()).isEqualTo(0);
+    }
+
+    @DisplayName("사용자가 좋아요를 누르지 않은 게시글을 조회하면 isLiked가 false이다.")
+    @Test
+    void findPostDetailWithoutLike() {
+        // given
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+        dietPlanRepository.insert(dietPlan);
+
+        Post post = createDummyPost(user.getId(), dietPlan.getId());
+        postRepository.insert(post);
+
+        // when
+        PostDetailResponse detail = postRepository.findPostDetail(post.getId(), user.getId()).orElse(null);
+
+        // then
+        assertThat(detail).isNotNull();
+        assertThat(detail.getIsLiked()).isFalse();
+        assertThat(detail.getLikeCount()).isEqualTo(0);
+    }
+
+    @DisplayName("로그인하지 않은 사용자가 게시글을 조회하면 isLiked가 false이다.")
+    @Test
+    void findPostDetailWithNullUser() {
+        // given
+        User user = createDummyUser();
+        userRepository.save(user);
+
+        DietPlan dietPlan = createDummyDietPlan(user.getId(), LocalDate.now(), LocalDate.now().plusDays(1));
+        dietPlanRepository.insert(dietPlan);
+
+        Post post = createDummyPost(user.getId(), dietPlan.getId());
+        postRepository.insert(post);
+
+        // 좋아요 추가
+        PostLike postLike = com.ssafy.yamyam_coach.domain.postlike.PostLike.builder()
+                .postId(post.getId())
+                .userId(user.getId())
+                .createdAt(java.time.LocalDateTime.now())
+                .build();
+        postLikeRepository.insert(postLike);
+
+        // when
+        PostDetailResponse detail = postRepository.findPostDetail(post.getId(), null).orElse(null);
+
+        // then
+        assertThat(detail).isNotNull();
+        assertThat(detail.getIsLiked()).isFalse();
+        assertThat(detail.getLikeCount()).isEqualTo(0);
     }
 
 }

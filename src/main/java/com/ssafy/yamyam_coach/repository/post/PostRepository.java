@@ -16,7 +16,7 @@ public interface PostRepository {
 
     int deleteById(Long postId);
 
-    Optional<PostDetailResponse> findPostDetail(Long postId);
+    Optional<PostDetailResponse> findPostDetail(Long postId, Long userId);
 
     int incrementLikeCount(Long postId);
 

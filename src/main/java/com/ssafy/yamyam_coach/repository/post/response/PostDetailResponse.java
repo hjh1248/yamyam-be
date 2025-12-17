@@ -12,6 +12,8 @@ public class PostDetailResponse {
     private Long postId;
     private String title;
     private String content;
+    private Integer likeCount;
+    private Boolean isLiked;
     private LocalDateTime createdAt;
 
     private UserDetailResponse author;

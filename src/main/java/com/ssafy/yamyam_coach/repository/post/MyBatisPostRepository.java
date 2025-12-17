@@ -36,8 +36,8 @@ public class MyBatisPostRepository implements PostRepository {
     }
 
     @Override
-    public Optional<PostDetailResponse> findPostDetail(Long postId) {
-        return Optional.ofNullable(postMapper.findPostDetail(postId));
+    public Optional<PostDetailResponse> findPostDetail(Long postId, Long userId) {
+        return Optional.ofNullable(postMapper.findPostDetail(postId, userId));
     }
 
     @Override

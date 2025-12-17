@@ -7,6 +7,9 @@ import com.ssafy.yamyam_coach.controller.post.request.UpdatePostRequest;
 import com.ssafy.yamyam_coach.exception.common.advice.GlobalRestExceptionHandler;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
 import com.ssafy.yamyam_coach.exception.post.PostException;
+import com.ssafy.yamyam_coach.repository.post.response.DietPlanDetailResponse;
+import com.ssafy.yamyam_coach.repository.post.response.PostDetailResponse;
+import com.ssafy.yamyam_coach.repository.post.response.UserDetailResponse;
 import com.ssafy.yamyam_coach.service.post.PostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +21,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import static com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode.NOT_FOUND_DIET_PLAN;
 import static com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode.UNAUTHORIZED_FOR_POST;
@@ -704,6 +711,239 @@ class PostControllerTest extends RestControllerTestSupport {
                         .andExpect(jsonPath("$.message").value("해당 게시글을 찾을 수 없습니다."))
                         .andExpect(jsonPath("$.timestamp").isNotEmpty());
 
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("getPostDetail")
+    class GetPostDetail {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        class SuccessCase {
+
+            @DisplayName("post 상세 조회 시 200 OK와 JSON 응답을 반환한다")
+            @Test
+            void getPostDetail() throws Exception {
+                // given
+                Long postId = 1L;
+
+                UserDetailResponse author = new UserDetailResponse();
+                author.setUserId(1L);
+                author.setNickname("테스트유저");
+
+                DietPlanDetailResponse dietPlan = new DietPlanDetailResponse();
+                dietPlan.setDietPlanId(1L);
+                dietPlan.setTitle("다이어트 식단");
+                dietPlan.setStartDate(LocalDate.of(2025, 12, 1));
+                dietPlan.setEndDate(LocalDate.of(2025, 12, 31));
+
+                PostDetailResponse response = new PostDetailResponse();
+                response.setPostId(postId);
+                response.setTitle("게시글 제목");
+                response.setContent("게시글 내용");
+                response.setLikeCount(0);
+                response.setIsLiked(false);
+                response.setCreatedAt(LocalDateTime.of(2025, 12, 18, 10, 0));
+                response.setAuthor(author);
+                response.setDietPlan(dietPlan);
+                response.setComments(new ArrayList<>());
+
+                // stubbing
+                given(postService.getPostDetail(anyLong(), anyLong()))
+                        .willReturn(response);
+
+                // when then
+                mockMvc.perform(
+                                get("/api/posts/{postId}", postId)
+                        )
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.postId").value(postId))
+                        .andExpect(jsonPath("$.title").value("게시글 제목"))
+                        .andExpect(jsonPath("$.content").value("게시글 내용"))
+                        .andExpect(jsonPath("$.likeCount").value(0))
+                        .andExpect(jsonPath("$.isLiked").value(false))
+                        .andExpect(jsonPath("$.author.userId").value(1L))
+                        .andExpect(jsonPath("$.author.nickname").value("테스트유저"))
+                        .andExpect(jsonPath("$.dietPlan.dietPlanId").value(1L))
+                        .andExpect(jsonPath("$.dietPlan.title").value("다이어트 식단"))
+                        .andExpect(jsonPath("$.comments").isArray())
+                        .andExpect(jsonPath("$.comments").isEmpty());
+            }
+
+            @DisplayName("좋아요를 누른 post 조회 시 isLiked가 true이고 likeCount가 증가한 응답을 반환한다")
+            @Test
+            void getPostDetailWithLike() throws Exception {
+                // given
+                Long postId = 1L;
+
+                UserDetailResponse author = new UserDetailResponse();
+                author.setUserId(1L);
+                author.setNickname("테스트유저");
+
+                PostDetailResponse response = new PostDetailResponse();
+                response.setPostId(postId);
+                response.setTitle("게시글 제목");
+                response.setContent("게시글 내용");
+                response.setLikeCount(1);  // 좋아요 수 1
+                response.setIsLiked(true);  // 좋아요 누름
+                response.setCreatedAt(LocalDateTime.of(2025, 12, 18, 10, 0));
+                response.setAuthor(author);
+                response.setDietPlan(null);
+                response.setComments(new ArrayList<>());
+
+                // stubbing
+                given(postService.getPostDetail(anyLong(), anyLong()))
+                        .willReturn(response);
+
+                // when then
+                mockMvc.perform(
+                                get("/api/posts/{postId}", postId)
+                        )
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.postId").value(postId))
+                        .andExpect(jsonPath("$.title").value("게시글 제목"))
+                        .andExpect(jsonPath("$.content").value("게시글 내용"))
+                        .andExpect(jsonPath("$.likeCount").value(1))
+                        .andExpect(jsonPath("$.isLiked").value(true))
+                        .andExpect(jsonPath("$.author.userId").value(1L))
+                        .andExpect(jsonPath("$.author.nickname").value("테스트유저"));
+            }
+
+            @DisplayName("좋아요를 누르지 않은 post 조회 시 isLiked가 false이고 likeCount가 0인 응답을 반환한다")
+            @Test
+            void getPostDetailWithoutLike() throws Exception {
+                // given
+                Long postId = 1L;
+
+                UserDetailResponse author = new UserDetailResponse();
+                author.setUserId(1L);
+                author.setNickname("테스트유저");
+
+                PostDetailResponse response = new PostDetailResponse();
+                response.setPostId(postId);
+                response.setTitle("게시글 제목");
+                response.setContent("게시글 내용");
+                response.setLikeCount(0);  // 좋아요 수 0
+                response.setIsLiked(false);  // 좋아요 안 누름
+                response.setCreatedAt(LocalDateTime.of(2025, 12, 18, 10, 0));
+                response.setAuthor(author);
+                response.setDietPlan(null);
+                response.setComments(new ArrayList<>());
+
+                // stubbing
+                given(postService.getPostDetail(anyLong(), anyLong()))
+                        .willReturn(response);
+
+                // when then
+                mockMvc.perform(
+                                get("/api/posts/{postId}", postId)
+                        )
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.postId").value(postId))
+                        .andExpect(jsonPath("$.likeCount").value(0))
+                        .andExpect(jsonPath("$.isLiked").value(false));
+            }
+
+            @DisplayName("여러 사용자가 좋아요를 누른 post를 조회하면 전체 좋아요 수와 현재 사용자의 좋아요 여부를 확인할 수 있다")
+            @Test
+            void getPostDetailWithMultipleLikes() throws Exception {
+                // given
+                Long postId = 1L;
+
+                UserDetailResponse author = new UserDetailResponse();
+                author.setUserId(1L);
+                author.setNickname("테스트유저");
+
+                PostDetailResponse response = new PostDetailResponse();
+                response.setPostId(postId);
+                response.setTitle("게시글 제목");
+                response.setContent("게시글 내용");
+                response.setLikeCount(5);  // 전체 좋아요 수 5
+                response.setIsLiked(true);  // 현재 사용자는 좋아요 누름
+                response.setCreatedAt(LocalDateTime.of(2025, 12, 18, 10, 0));
+                response.setAuthor(author);
+                response.setDietPlan(null);
+                response.setComments(new ArrayList<>());
+
+                // stubbing
+                given(postService.getPostDetail(anyLong(), anyLong()))
+                        .willReturn(response);
+
+                // when then
+                mockMvc.perform(
+                                get("/api/posts/{postId}", postId)
+                        )
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.postId").value(postId))
+                        .andExpect(jsonPath("$.likeCount").value(5))
+                        .andExpect(jsonPath("$.isLiked").value(true));
+            }
+
+            @DisplayName("dietPlan이 없는 post도 정상적으로 조회할 수 있다")
+            @Test
+            void getPostDetailWithoutDietPlan() throws Exception {
+                // given
+                Long postId = 1L;
+
+                UserDetailResponse author = new UserDetailResponse();
+                author.setUserId(1L);
+                author.setNickname("테스트유저");
+
+                PostDetailResponse response = new PostDetailResponse();
+                response.setPostId(postId);
+                response.setTitle("게시글 제목");
+                response.setContent("게시글 내용");
+                response.setLikeCount(0);
+                response.setIsLiked(false);
+                response.setCreatedAt(LocalDateTime.of(2025, 12, 18, 10, 0));
+                response.setAuthor(author);
+                response.setDietPlan(null);  // dietPlan 없음
+                response.setComments(new ArrayList<>());
+
+                // stubbing
+                given(postService.getPostDetail(anyLong(), anyLong()))
+                        .willReturn(response);
+
+                // when then
+                mockMvc.perform(
+                                get("/api/posts/{postId}", postId)
+                        )
+                        .andDo(print())
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.postId").value(postId))
+                        .andExpect(jsonPath("$.dietPlan").isEmpty());
+            }
+        }
+
+        @Nested
+        @DisplayName("실패 케이스")
+        class FailureCase {
+
+            @DisplayName("존재하지 않는 post 조회 시 404 응답이 반환된다")
+            @Test
+            void getNotExistingPost() throws Exception {
+                // given
+                Long postId = 999L;
+
+                // stubbing
+                given(postService.getPostDetail(anyLong(), anyLong()))
+                        .willThrow(new PostException(NOT_FOUND_POST));
+
+                // when then
+                mockMvc.perform(
+                                get("/api/posts/{postId}", postId)
+                        )
+                        .andDo(print())
+                        .andExpect(status().isNotFound())
+                        .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                        .andExpect(jsonPath("$.message").value("해당 게시글을 찾을 수 없습니다."))
+                        .andExpect(jsonPath("$.timestamp").isNotEmpty());
             }
         }
     }
