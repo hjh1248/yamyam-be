@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.yamyam_coach.mapper.body_spec.BodySpecMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO body_specs (user_id, height, weight, age, gender, created_at)
+        VALUES (#{userId}, #{height}, #{weight}, #{age}, #{gender}, #{createdAt})
+    </insert>
+
+    <select id="findAllByUserId" resultType="com.ssafy.yamyam_coach.domain.body_spec.BodySpec">
+        SELECT id, user_id, height, weight, age, gender, created_at
+        FROM body_specs
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC, id DESC
+    </select>
+
+    <delete id="delete">
+        DELETE FROM body_specs WHERE id = #{id}
+    </delete>
+
+</mapper>

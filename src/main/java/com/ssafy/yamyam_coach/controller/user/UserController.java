@@ -6,6 +6,7 @@ import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.global.annotation.LoginUser;
 import com.ssafy.yamyam_coach.service.user.UserService;
 import com.ssafy.yamyam_coach.service.user.response.UserLoginServiceResponse;
+import com.ssafy.yamyam_coach.service.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,9 +38,8 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(401).body("로그인 필요");
         }
-        System.out.println("ID: " + user.getId());
-        System.out.println("Email: " + user.getEmail());
 
-        return ResponseEntity.ok(user);
+        // 서비스에게 "이 유저 프로필 정보 줘" 하고 시키기
+        return ResponseEntity.ok(userService.getUserProfile(user));
     }
 }

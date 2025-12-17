@@ -20,16 +20,16 @@ public class BodySpec {
     private int age;          // 나이
     private String gender;    // 성별 ("MALE", "FEMALE" 문자열 저장)
 
-    private LocalDateTime created_at; // 측정일 (DATETIME)
+    private LocalDateTime createdAt; // 측정일 (DATETIME)
 
     // ID는 DB 자동 생성이므로 제외, 측정 데이터 입력용 빌더
     @Builder
-    private BodySpec(Long userId, int height, int weight, int age, String gender, LocalDateTime created_at) {
+    private BodySpec(Long userId, int height, int weight, int age, String gender, LocalDateTime createdAt) {
         this.userId = userId;
         this.height = height;
         this.weight = weight;
         this.age = age;
         this.gender = gender;
-        this.created_at = created_at;
+        this.createdAt = createdAt;
     }
 }

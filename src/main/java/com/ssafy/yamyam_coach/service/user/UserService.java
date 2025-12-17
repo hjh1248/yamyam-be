@@ -5,6 +5,7 @@ import com.ssafy.yamyam_coach.repository.user.UserRepository;
 import com.ssafy.yamyam_coach.service.user.request.UserCreateServiceRequest;
 import com.ssafy.yamyam_coach.service.user.response.UserLoginServiceResponse;
 import com.ssafy.yamyam_coach.security.JwtTokenProvider;
+import com.ssafy.yamyam_coach.service.user.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -48,5 +49,12 @@ public class UserService {
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .build();
+    }
+
+    // User 객체를 받아서 응답 DTO를 만들어주는 메서드
+    @Transactional(readOnly = true)
+    public UserResponse getUserProfile(User user) {
+        // 나중에 여기에 팔로워 수 DB 조회 로직 추가 가능
+        return new UserResponse(user);
     }
 }
