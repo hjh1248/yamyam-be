@@ -31,7 +31,7 @@ public class DietPlanController {
         log.debug("[DietPlanController.registerDietPlan]: diet plan 생성 요청: {}", request);
 
         Long currentUserId = currentUser.getId();
-        /** todo 추후 jwt 에서 꺼내오도록 변경 예정 */
+
         Long createdPlanId = dietPlanService.registerDietPlan(currentUserId, request.toServiceRequest());
 
         log.debug("[DietPlanController.registerDietPlan]: diet plan 생성완료! id: {}", createdPlanId);
