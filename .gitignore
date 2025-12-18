@@ -41,3 +41,7 @@ application-test.yaml
 application-dev.yaml
 compose.yaml
 mysql_data
+
+### Custom ###
+TEST_GUIDE.md
+API_DOCUMENTATION.md

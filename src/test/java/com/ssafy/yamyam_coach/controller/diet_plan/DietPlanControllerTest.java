@@ -6,7 +6,6 @@ import com.ssafy.yamyam_coach.controller.diet_plan.request.CreateDietPlanRequest
 import com.ssafy.yamyam_coach.controller.diet_plan.request.UpdateDietPlanRequest;
 import com.ssafy.yamyam_coach.exception.common.advice.GlobalRestExceptionHandler;
 import com.ssafy.yamyam_coach.exception.diet_plan.DietPlanException;
-import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietDetailResponse;
 import com.ssafy.yamyam_coach.service.diet_plan.DietPlanService;
 import com.ssafy.yamyam_coach.service.diet_plan.request.UpdateDietPlanServiceRequest;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
@@ -22,10 +21,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
-import java.time.format.TextStyle;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import static com.ssafy.yamyam_coach.exception.diet_plan.DietPlanErrorCode.*;
 import static org.hamcrest.Matchers.endsWith;
@@ -369,7 +366,7 @@ class DietPlanControllerTest extends RestControllerTestSupport {
                 Long dietPlanId = 1L;
 
                 // stubbing
-                doThrow(new DietPlanException(UNAUTHORIZED))
+                doThrow(new DietPlanException(UNAUTHORIZED_FOR_DELETE))
                         .when(dietPlanService).deleteById(anyLong(), anyLong());
 
                 // when then
@@ -635,7 +632,7 @@ class DietPlanControllerTest extends RestControllerTestSupport {
                 UpdateDietPlanRequest request = createUpdateRequest("내용", null, null);
 
                 // stubbing
-                doThrow(new DietPlanException(UNAUTHORIZED))
+                doThrow(new DietPlanException(UNAUTHORIZED_FOR_DELETE))
                         .when(dietPlanService).updateDietPlan(anyLong(), any(UpdateDietPlanServiceRequest.class));
 
                 // when then

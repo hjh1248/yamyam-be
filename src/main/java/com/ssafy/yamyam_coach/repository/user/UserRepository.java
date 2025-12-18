@@ -12,4 +12,6 @@ public interface UserRepository {
     Optional<User> findByEmail(String email);
 
     boolean existsByNickname(String nickname);
+
+    int deleteById(Long userId);
 }

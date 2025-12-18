@@ -21,4 +21,6 @@ public interface UserMapper {
     User findById(Long userId);
 
     List<User> searchByKeyword(@Param("keyword") String keyword);
+
+    int deleteById(Long userId);
 }
