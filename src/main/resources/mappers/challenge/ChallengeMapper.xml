@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.yamyam_coach.mapper.challenge.ChallengeMapper">
+
+    <insert id="saveChallenge" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO challenges (creator_id, title, description, start_date, end_date, status, created_at)
+        VALUES (#{creatorId}, #{title}, #{description}, #{startDate}, #{endDate}, 'ACTIVE', #{createdAt})
+    </insert>
+
+    <select id="findMyChallenges" resultType="com.ssafy.yamyam_coach.service.challenge.response.ChallengeResponse">
+        SELECT c.id, c.creator_id AS creatorId, c.title, c.description,
+               c.start_date AS startDate, c.end_date AS endDate,
+               c.status AS challengeStatus, cp.status AS myStatus        FROM challenges c
+                                                                                  JOIN challenge_participations cp ON c.id = cp.challenge_id
+        WHERE cp.user_id = #{userId} AND cp.status = 'PROGRESS'
+    </select>
+
+    <select id="findAvailableChallenges" resultType="com.ssafy.yamyam_coach.service.challenge.response.ChallengeResponse">
+        SELECT c.id, c.creator_id AS creatorId, c.title, c.description,
+               c.start_date AS startDate, c.end_date AS endDate,
+               (SELECT COUNT(*) FROM challenge_participations WHERE challenge_id = c.id AND status = 'PROGRESS') as participants
+        FROM challenges c
+        WHERE c.status = 'ACTIVE' AND c.end_date >= NOW()
+          AND c.id NOT IN (
+            SELECT challenge_id FROM challenge_participations
+            WHERE user_id = #{userId} AND status = 'PROGRESS'
+        )
+    </select>
+
+    <select id="findById" resultType="com.ssafy.yamyam_coach.domain.challenge.Challenge">
+        SELECT * FROM challenges WHERE id = #{id}
+    </select>
+
+    <insert id="saveParticipation">
+        INSERT INTO challenge_participations (user_id, challenge_id, status, created_at)
+        VALUES (#{userId}, #{challengeId}, #{status}, #{created_at})
+    </insert>
+
+    <update id="updateParticipationStatus">
+        UPDATE challenge_participations SET status = #{status}
+        WHERE user_id = #{userId} AND challenge_id = #{challengeId}
+    </update>
+
+    <select id="existsParticipation" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM challenge_participations WHERE user_id = #{userId} AND challenge_id = #{challengeId} AND status = 'PROGRESS')
+    </select>
+
+    <update id="softDeleteChallenge">
+        UPDATE challenges SET status = 'DELETED' WHERE id = #{challengeId}
+    </update>
+
+</mapper>

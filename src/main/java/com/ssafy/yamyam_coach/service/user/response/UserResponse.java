@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class UserResponse {
 
+    private Long id;
     private String email;
     private String nickname;
     private String name;
@@ -16,7 +17,8 @@ public class UserResponse {
     private int following; // 내가 팔로우하는 사람 수
 
     @Builder
-    private UserResponse(String email, String nickname, String name, int followers, int following) {
+    private UserResponse(Long id, String email, String nickname, String name, int followers, int following) {
+        this.id = id;
         this.email = email;
         this.nickname = nickname;
         this.name = name;
@@ -27,6 +29,7 @@ public class UserResponse {
     // User 엔티티 -> UserResponse DTO 변환 (팔로우 숫자 포함)
     public static UserResponse of(User user, int followers, int following) {
         return UserResponse.builder()
+                .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
                 .name(user.getName())

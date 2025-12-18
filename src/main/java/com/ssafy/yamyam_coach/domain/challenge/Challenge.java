@@ -16,6 +16,8 @@ public class Challenge {
 
     private String title;         // 챌린지 제목
     private String description;   // 챌린지 설명 (TEXT 타입도 String으로 받음)
+    private String status;
+    private Long creatorId;
 
     private LocalDateTime startDate; // 시작일 (start_date -> startDate)
     private LocalDateTime endDate;   // 종료일 (end_date -> endDate)
@@ -24,11 +26,13 @@ public class Challenge {
 
     // ID 제외, 챌린지 생성 시 필요한 정보만 담는 빌더
     @Builder
-    private Challenge(String title, String description, LocalDateTime startDate, LocalDateTime endDate, LocalDateTime createdAt) {
+    private Challenge(String title, String description, LocalDateTime startDate, LocalDateTime endDate, LocalDateTime createdAt, Long creatorId, String status) {
         this.title = title;
         this.description = description;
         this.startDate = startDate;
         this.endDate = endDate;
         this.createdAt = createdAt;
+        this.creatorId = creatorId;
+        this.status = status;
     }
 }
