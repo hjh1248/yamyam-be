@@ -355,7 +355,7 @@ class PostServiceTest extends IntegrationTestSupport {
         @DisplayName("실패 케이스")
         class FailureCase {
 
-            @DisplayName("존재하지 않는 post를 수정하려 할 때 NOT_FOUND_POST 예외가 발생한다.")
+            @DisplayName("존재하지 않는 post를 수정하려 할 때 NOT_FOUND_COMMENT 예외가 발생한다.")
             @Test
             void updateNotExistingPost() {
                 // given
@@ -511,7 +511,7 @@ class PostServiceTest extends IntegrationTestSupport {
         @DisplayName("실패 케이스")
         class FailureCase {
 
-            @DisplayName("존재하지 않는 post를 삭제하려 할 때 NOT_FOUND_POST 예외가 발생한다.")
+            @DisplayName("존재하지 않는 post를 삭제하려 할 때 NOT_FOUND_COMMENT 예외가 발생한다.")
             @Test
             void deleteNotExistingPost() {
                 // given
@@ -630,7 +630,7 @@ class PostServiceTest extends IntegrationTestSupport {
         @DisplayName("실패 케이스")
         class FailureCase {
 
-            @DisplayName("post 가 없다면 NOT_FOUND_POST 예외가 발생한다.")
+            @DisplayName("post 가 없다면 NOT_FOUND_COMMENT 예외가 발생한다.")
             @Test
             void notFoundPost() {
                 // given
@@ -737,7 +737,7 @@ class PostServiceTest extends IntegrationTestSupport {
         @DisplayName("실패 케이스")
         class FailureCase {
 
-            @DisplayName("post 가 없다면 NOT_FOUND_POST 예외가 발생한다.")
+            @DisplayName("post 가 없다면 NOT_FOUND_COMMENT 예외가 발생한다.")
             @Test
             void notFoundPost() {
                 // given
@@ -907,7 +907,7 @@ class PostServiceTest extends IntegrationTestSupport {
         @DisplayName("실패 케이스")
         class FailureCase {
 
-            @DisplayName("존재하지 않는 post를 조회하려 할 때 NOT_FOUND_POST 예외가 발생한다.")
+            @DisplayName("존재하지 않는 post를 조회하려 할 때 NOT_FOUND_COMMENT 예외가 발생한다.")
             @Test
             void getNotExistingPost() {
                 // given
