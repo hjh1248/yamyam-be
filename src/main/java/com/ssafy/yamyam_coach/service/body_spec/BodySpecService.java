@@ -37,4 +37,11 @@ public class BodySpecService {
     public void delete(Long id) {
         bodySpecRepository.delete(id);
     }
+
+    @Transactional(readOnly = true)
+    public List<BodySpecServiceResponse> getBodySpecsByUserId(Long userId) {
+        return bodySpecRepository.findAllByUserId(userId).stream()
+                .map(BodySpecServiceResponse::of) // DTO 생성자 사용
+                .collect(Collectors.toList());
+    }
 }

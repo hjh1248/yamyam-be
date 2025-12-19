@@ -39,5 +39,9 @@
         WHERE id = #{user_id}
     </delete>
 
+    <select id="existsById" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM users WHERE id = #{id}
+    </select>
+
 </mapper>
 

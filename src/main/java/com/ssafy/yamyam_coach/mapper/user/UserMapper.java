@@ -1,6 +1,7 @@
 package com.ssafy.yamyam_coach.mapper.user;
 
 import com.ssafy.yamyam_coach.domain.user.User;
+import com.ssafy.yamyam_coach.service.user.response.UserProfileResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,4 +24,10 @@ public interface UserMapper {
     List<User> searchByKeyword(@Param("keyword") String keyword);
 
     int deleteById(Long userId);
+
+    // 타인 프로필 조회 (내 ID를 같이 넘겨서 팔로우 여부 확인)
+    UserProfileResponse findUserProfile(@Param("targetId") Long targetId, @Param("myId") Long myId);
+
+    // (참고) 유저 존재 확인용
+    boolean existsById(Long id);
 }

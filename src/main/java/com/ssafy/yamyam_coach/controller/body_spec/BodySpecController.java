@@ -1,4 +1,4 @@
-package com.ssafy.yamyam_coach.controller;
+package com.ssafy.yamyam_coach.controller.body_spec;
 
 import com.ssafy.yamyam_coach.domain.user.User; // User 엔티티 import
 import com.ssafy.yamyam_coach.controller.body_spec.request.BodySpecCreateRequest;
@@ -53,5 +53,11 @@ public class BodySpecController {
         // (심화) 여기서 user.getId()랑 삭제하려는 데이터의 주인이 같은지 확인하는 로직 넣으면 더 좋음
         bodySpecService.delete(id);
         return ResponseEntity.ok("삭제되었습니다.");
+    }
+
+    // 타인의 신체 정보 목록 조회 (수정/삭제 기능은 없음)
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<List<BodySpecServiceResponse>> getUserBodySpecs(@PathVariable Long userId) {
+        return ResponseEntity.ok(bodySpecService.getBodySpecsByUserId(userId));
     }
 }

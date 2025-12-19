@@ -7,6 +7,7 @@ import com.ssafy.yamyam_coach.repository.user.UserRepository;
 import com.ssafy.yamyam_coach.service.user.request.UserCreateServiceRequest;
 import com.ssafy.yamyam_coach.service.user.response.UserLoginServiceResponse;
 import com.ssafy.yamyam_coach.security.JwtTokenProvider;
+import com.ssafy.yamyam_coach.service.user.response.UserProfileResponse;
 import com.ssafy.yamyam_coach.service.user.response.UserResponse;
 import com.ssafy.yamyam_coach.service.user.response.UserSearchResponse;
 import lombok.RequiredArgsConstructor;
@@ -101,5 +102,41 @@ public class UserService {
                     return new UserSearchResponse(user, isFollowing);
                 })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 타인 프로필 조회
+     * @param targetId 조회할 대상의 ID
+     * @param myId 로그인한 내 ID (팔로우 여부 확인용)
+     */
+    @Transactional(readOnly = true)
+    public UserProfileResponse getUserProfile(Long targetId, Long myId) {
+
+        // 1. 유저 기본 정보 가져오기 (없으면 에러)
+        User user = userMapper.findById(targetId);
+        if (user == null) {
+            throw new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+        }
+
+        // 2. DB에서 진짜 숫자 가져오기! (Repository 호출)
+        int followerCount = followRepository.countFollowers(targetId);
+        int followingCount = followRepository.countFollowing(targetId);
+
+        // 3. 내가 팔로우했는지 확인 (로그인 안 했으면(myId=0) 무조건 false)
+        boolean isFollowing = false;
+        if (myId != null && myId != 0) {
+            isFollowing = followRepository.exists(myId, targetId);
+        }
+
+        // 4. DTO 빌더에 숫자와 정보 넣기
+        return UserProfileResponse.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .name(user.getName())
+                .followers(followerCount)  // 조회한 숫자 주입
+                .following(followingCount) // 조회한 숫자 주입
+                .isFollowing(isFollowing)  // 조회한 상태 주입
+                .build();
     }
 }

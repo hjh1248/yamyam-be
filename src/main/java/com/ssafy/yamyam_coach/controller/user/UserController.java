@@ -6,6 +6,7 @@ import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.global.annotation.LoginUser;
 import com.ssafy.yamyam_coach.service.user.UserService;
 import com.ssafy.yamyam_coach.service.user.response.UserLoginServiceResponse;
+import com.ssafy.yamyam_coach.service.user.response.UserProfileResponse;
 import com.ssafy.yamyam_coach.service.user.response.UserResponse;
 import com.ssafy.yamyam_coach.service.user.response.UserSearchResponse;
 import lombok.RequiredArgsConstructor;
@@ -60,5 +61,17 @@ public class UserController {
         List<UserSearchResponse> result = userService.searchUsers(keyword, user.getId());
 
         return ResponseEntity.ok(result);
+    }
+
+    // [GET] /api/users/{id} : 타인 프로필 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<UserProfileResponse> getUserProfile(
+            @PathVariable Long id,
+            @LoginUser User loginUser // 로그인한 내 정보 (팔로우 여부 확인용)
+    ) {
+        // 로그인 안 한 상태면 myId를 null이나 0으로 처리하거나 401 에러
+        Long myId = (loginUser != null) ? loginUser.getId() : 0L;
+
+        return ResponseEntity.ok(userService.getUserProfile(id, myId));
     }
 }
