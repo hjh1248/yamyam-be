@@ -12,17 +12,16 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
 
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor // 생성자 주입을 위해 추가!
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter; // 우리가 만든 필터 주입
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,15 +35,19 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 로그인, 회원가입은 누구나 가능
+                        // 1. 누구나 접근 가능 (순서 1등)
                         .requestMatchers("/api/users/signup", "/api/users/login", "/error").permitAll()
-                        // 그 외 모든 요청은 인증 필요 (이제 필터가 검사해줄 거야!)
+
+                        // ★ 2. [추가] 관리자 전용 페이지 설정 (순서 2등) ★
+                        // "/api/admin"으로 시작하는 모든 주소는 ADMIN 권한이 있어야 함
+                        // hasRole("ADMIN")은 자동으로 "ROLE_ADMIN"을 검사합니다.
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+
+                        // 3. 나머지 모든 요청은 로그인(인증)만 하면 됨 (순서 꼴찌)
                         .anyRequest().authenticated()
                 )
-                // ★ 여기가 핵심! ★
-                // UsernamePasswordAuthenticationFilter(기본 로그인 필터) "앞에"
-                // 우리가 만든 JwtAuthenticationFilter를 끼워 넣는다!
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

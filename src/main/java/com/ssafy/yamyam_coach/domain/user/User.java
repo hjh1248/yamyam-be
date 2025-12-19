@@ -21,6 +21,8 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private Role role;
+
     public static User createMockUser() {
         User mockUser = User.builder().build();
         mockUser.id = 1L;
@@ -35,5 +37,9 @@ public class User {
         this.name = name;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    public String getRoleKey() {
+        return this.role.getAuthority();
     }
 }

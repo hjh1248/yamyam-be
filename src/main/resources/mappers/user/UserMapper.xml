@@ -5,12 +5,12 @@
 <mapper namespace="com.ssafy.yamyam_coach.mapper.user.UserMapper">
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO users (email, password, nickname, name, created_at, updated_at)
-        VALUES (#{email}, #{password}, #{nickname}, #{name}, #{createdAt}, #{updatedAt})
+        INSERT INTO users (email, password, nickname, name, created_at, updated_at, role)
+        VALUES (#{email}, #{password}, #{nickname}, #{name}, #{createdAt}, #{updatedAt}, #{role})
     </insert>
 
     <select id="findByEmail" resultType="User">
-        SELECT id, email, password, nickname, name, created_at, updated_at
+        SELECT id, email, password, nickname, name, created_at, updated_at, role
         FROM users
         WHERE email = #{email}
     </select>
