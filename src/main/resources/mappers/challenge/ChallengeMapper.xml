@@ -90,4 +90,37 @@
         WHERE user_id = #{userId} AND challenge_id = #{challengeId}
     </select>
 
+    <select id="findAllChallenges" resultType="com.ssafy.yamyam_coach.service.challenge.response.ChallengeResponse">
+        SELECT
+        c.id,
+        c.creator_id AS creatorId,
+        c.title,
+        c.description,
+        c.start_date AS startDate,
+        c.end_date AS endDate,
+        c.status AS challengeStatus,
+        -- 참여자 수 카운트
+        (SELECT COUNT(*) FROM challenge_participations WHERE challenge_id = c.id AND status = 'PROGRESS') as participants
+        FROM challenges c
+        WHERE c.status != 'DELETED' -- 삭제된 건 기본적으로 제외
+
+        <if test="status != null and status != 'ALL'">
+            <choose>
+                <when test="status == 'RECRUITING'">
+                    AND c.start_date > NOW()
+                </when>
+
+                <when test="status == 'PROGRESS'">
+                    AND c.start_date &lt;= NOW() AND c.end_date >= NOW()
+                </when>
+
+                <when test="status == 'ENDED'">
+                    AND c.end_date &lt; NOW()
+                </when>
+            </choose>
+        </if>
+
+        ORDER BY c.created_at DESC
+    </select>
+
 </mapper>

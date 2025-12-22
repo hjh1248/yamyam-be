@@ -150,4 +150,14 @@ public class ChallengeService {
             challengeMapper.saveDailyLog(log);
         }
     }
+
+    // [추가] 전체 챌린지 조회
+    @Transactional(readOnly = true)
+    public List<ChallengeResponse> getAllChallenges(String status, Long userId) {
+        List<ChallengeResponse> list = challengeMapper.findAllChallenges(status);
+
+        // 각각의 챌린지에 대해 '내가 참여 중인지' 여부 등을 체크해주면 프론트에서 편함 (선택사항)
+        // 여기서는 일단 리스트만 반환
+        return list;
+    }
 }

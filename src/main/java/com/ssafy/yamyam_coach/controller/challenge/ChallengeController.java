@@ -73,4 +73,13 @@ public class ChallengeController {
         challengeService.toggleDailyLog(id, user.getId(), dateStr);
         return ResponseEntity.ok().build();
     }
+
+    // [추가] 챌린지 전체 목록 조회 (검색 조건: status)
+    @GetMapping
+    public ResponseEntity<List<ChallengeResponse>> getAllChallenges(
+            @RequestParam(required = false) String status, // 'ALL', 'ACTIVE', 'ENDED' 등
+            @LoginUser User user
+    ) {
+        return ResponseEntity.ok(challengeService.getAllChallenges(status, user.getId()));
+    }
 }

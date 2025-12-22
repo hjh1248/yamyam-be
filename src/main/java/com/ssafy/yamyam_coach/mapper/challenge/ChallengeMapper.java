@@ -41,4 +41,6 @@ public interface ChallengeMapper {
     boolean existsLog(@Param("challengeId") Long challengeId, @Param("userId") Long userId, @Param("logDate") LocalDate logDate);
 
     ChallengeParticipation findHistory(@Param("userId") Long userId, @Param("challengeId") Long challengeId);
+
+    List<ChallengeResponse> findAllChallenges(@Param("status") String status);
 }
