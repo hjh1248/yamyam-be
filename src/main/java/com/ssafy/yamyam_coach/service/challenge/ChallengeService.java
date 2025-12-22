@@ -33,8 +33,13 @@ public class ChallengeService {
     // 조회
     @Transactional(readOnly = true)
     public List<ChallengeResponse> getMyChallenges(Long userId) {
-        List<ChallengeResponse> list = challengeRepository.findMyChallenges(userId);
-        list.forEach(ChallengeResponse::calculateProgress);
+        List<ChallengeResponse> list = challengeMapper.findMyChallenges(userId); // Repository 대신 Mapper 바로 사용 추천
+
+        // ★ 가져온 리스트 하나하나 돌면서 진행률 계산
+        for (ChallengeResponse c : list) {
+            c.calculateProgress();
+        }
+
         return list;
     }
 

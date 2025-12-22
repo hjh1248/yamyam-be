@@ -8,11 +8,23 @@
     </insert>
 
     <select id="findMyChallenges" resultType="com.ssafy.yamyam_coach.service.challenge.response.ChallengeResponse">
-        SELECT c.id, c.creator_id AS creatorId, c.title, c.description,
-               c.start_date AS startDate, c.end_date AS endDate,
-               c.status AS challengeStatus, cp.status AS myStatus        FROM challenges c
-                                                                                  JOIN challenge_participations cp ON c.id = cp.challenge_id
-        WHERE cp.user_id = #{userId} AND cp.status = 'PROGRESS'
+        SELECT
+            c.id,
+            c.creator_id AS creatorId,
+            c.title,
+            c.description,
+            c.start_date AS startDate,
+            c.end_date AS endDate,
+            c.status AS challengeStatus,
+            cp.status AS myStatus,
+            -- ★ [추가] 내가 성공한 횟수 카운트 (서브쿼리)
+            (SELECT COUNT(*)
+             FROM challenge_daily_logs
+             WHERE challenge_id = c.id AND user_id = #{userId}) AS successCount
+        FROM challenges c
+                 JOIN challenge_participations cp ON c.id = cp.challenge_id
+        WHERE cp.user_id = #{userId}
+          AND (cp.status = 'PROGRESS' OR cp.status = 'STOPPED') -- 포기한 것도 목록엔 보이게 하려면 포함
     </select>
 
     <select id="findAvailableChallenges" resultType="com.ssafy.yamyam_coach.service.challenge.response.ChallengeResponse">
