@@ -24,4 +24,6 @@ public interface ChallengeRepository {
 
     // 4. 챌린지 삭제 (소프트 삭제: status -> 'DELETED')
     void softDeleteChallenge(Long challengeId);
+
+    List<Challenge> findAllById(List<Long> ids);
 }

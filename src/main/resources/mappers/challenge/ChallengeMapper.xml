@@ -123,4 +123,12 @@
         ORDER BY c.created_at DESC
     </select>
 
+    <select id="findAllById" resultType="com.ssafy.yamyam_coach.domain.challenge.Challenge">
+        SELECT *
+        FROM challenges WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
 </mapper>

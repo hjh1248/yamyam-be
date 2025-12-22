@@ -19,7 +19,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping
-    public String chat(@LoginUser User user, @RequestBody @Valid ChatRequest request) {
-        return chatService.request(user.getId(), request.getBodySpecId(), request.getContent());
+    public String chat(@LoginUser User user, @RequestBody ChatRequest request) {
+        return chatService.request(user.getId(), request);
     }
 }

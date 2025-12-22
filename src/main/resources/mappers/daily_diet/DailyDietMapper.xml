@@ -141,4 +141,11 @@
             </foreach>
         </if>
     </delete>
+
+    <select id="findAllById" resultType="com.ssafy.yamyam_coach.domain.daily_diet.DailyDiet">
+        SELECT *
+        FROM daily_diets  WHERE daily_diet_id IN <foreach item="id" collection="ids" open="(" separator="," close=")">
+        #{id}
+    </foreach>
+    </select>
 </mapper>

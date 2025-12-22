@@ -28,4 +28,13 @@ public class MyBatisBodySpecRepository implements BodySpecRepository {
     public void delete(Long id) {
         bodySpecMapper.delete(id);
     }
+
+    @Override
+    public List<BodySpec> findAllById(List<Long> ids) {
+        // 빈 리스트가 들어오면 DB 에러가 날 수 있으므로 방어 로직 추가 추천
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return bodySpecMapper.findAllById(ids);
+    }
 }

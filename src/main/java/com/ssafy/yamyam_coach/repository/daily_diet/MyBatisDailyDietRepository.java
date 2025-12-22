@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,6 +66,14 @@ public class MyBatisDailyDietRepository implements DailyDietRepository {
         }
         
         return dailyDietMapper.deleteByDietPlanAndDateInBatch(dietPlanId, datesToDelete);
+    }
+
+    @Override
+    public List<DailyDiet> findAllById(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return dailyDietMapper.findAllById(ids);
     }
 
 }

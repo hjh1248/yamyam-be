@@ -43,4 +43,6 @@ public interface ChallengeMapper {
     ChallengeParticipation findHistory(@Param("userId") Long userId, @Param("challengeId") Long challengeId);
 
     List<ChallengeResponse> findAllChallenges(@Param("status") String status);
+
+    List<Challenge> findAllById(@Param("ids") List<Long> ids);
 }

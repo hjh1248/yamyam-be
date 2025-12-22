@@ -7,4 +7,5 @@ public interface BodySpecRepository {
     BodySpec save(BodySpec bodySpec);
     List<BodySpec> findAllByUserId(Long userId);
     void delete(Long id);
+    List<BodySpec> findAllById(List<Long> ids);
 }

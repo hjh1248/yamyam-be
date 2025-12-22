@@ -7,6 +7,7 @@ import com.ssafy.yamyam_coach.service.challenge.response.ChallengeResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -53,5 +54,13 @@ public class MyBatisChallengeRepository implements ChallengeRepository {
     @Override
     public void softDeleteChallenge(Long challengeId) {
         challengeMapper.softDeleteChallenge(challengeId);
+    }
+
+    @Override
+    public List<Challenge> findAllById(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return challengeMapper.findAllById(ids);
     }
 }

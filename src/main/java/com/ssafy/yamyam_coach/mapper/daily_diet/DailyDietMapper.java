@@ -29,4 +29,6 @@ public interface DailyDietMapper {
     int deleteById(Long dailyDietId);
 
     int deleteByDietPlanAndDateInBatch(@Param("dietPlanId") Long dietPlanId, @Param("datesToDelete") List<LocalDate> datesToDelete);
+
+    List<DailyDiet> findAllById(@Param("ids") List<Long> ids);
 }
