@@ -22,6 +22,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -34,6 +35,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // 인증 실패(401) 시 jwtAuthenticationEntryPoint가 실행되도록 설정
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                )
                 .authorizeHttpRequests(auth -> auth
                         // 1. 누구나 접근 가능 (순서 1등)
                         .requestMatchers("/api/users/signup", "/api/users/login", "/error").permitAll()
