@@ -6,6 +6,7 @@ import com.ssafy.yamyam_coach.domain.user.User;
 import com.ssafy.yamyam_coach.global.annotation.LoginUser;
 import com.ssafy.yamyam_coach.service.diet_plan.DietPlanService;
 import com.ssafy.yamyam_coach.service.diet_plan.request.UpdateDietPlanServiceRequest;
+import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanDetailServiceResponse;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -87,6 +88,12 @@ public class DietPlanController {
     public ResponseEntity<List<DietPlanServiceResponse>> getMyDietPlans(@LoginUser User currentUser) {
         Long currentUserId = currentUser.getId();
         return ResponseEntity.ok(dietPlanService.getMyDietPlans(currentUserId));
+    }
+
+    @GetMapping("/my/details")
+    public ResponseEntity<List<DietPlanDetailServiceResponse>> getMyDietPlanDetails(@LoginUser User currentUser) {
+        List<DietPlanDetailServiceResponse> myDietPlanDetails = dietPlanService.getMyDietPlanDetails(currentUser.getId());
+        return ResponseEntity.ok(myDietPlanDetails);
     }
 
     @GetMapping("/my/primary")

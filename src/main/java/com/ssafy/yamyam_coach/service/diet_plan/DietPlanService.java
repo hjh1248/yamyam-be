@@ -13,8 +13,14 @@ import com.ssafy.yamyam_coach.repository.diet_plan.DietPlanRepository;
 import com.ssafy.yamyam_coach.repository.diet_plan.request.UpdateDietPlanRepositoryRequest;
 import com.ssafy.yamyam_coach.repository.meal.MealRepository;
 import com.ssafy.yamyam_coach.repository.mealfood.MealFoodRepository;
+import com.ssafy.yamyam_coach.repository.post.response.DietPlanDetailResponse;
+import com.ssafy.yamyam_coach.service.daily_diet.DailyDietService;
+import com.ssafy.yamyam_coach.service.daily_diet.request.DailyDietDetailServiceRequest;
+import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietDetailResponse;
+import com.ssafy.yamyam_coach.service.daily_diet.response.DailyDietsResponse;
 import com.ssafy.yamyam_coach.service.diet_plan.request.CreateDietPlanServiceRequest;
 import com.ssafy.yamyam_coach.service.diet_plan.request.UpdateDietPlanServiceRequest;
+import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanDetailServiceResponse;
 import com.ssafy.yamyam_coach.service.diet_plan.response.DietPlanServiceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -37,6 +44,7 @@ import static com.ssafy.yamyam_coach.exception.post.PostErrorCode.NOT_FOUND_POST
 public class DietPlanService {
 
     private final DietPlanRepository dietPlanRepository;
+    private final DailyDietService dailyDietService;
     private final DailyDietRepository dailyDietRepository;
     private final MealRepository mealRepository;
     private final MealFoodRepository mealFoodRepository;
@@ -76,6 +84,31 @@ public class DietPlanService {
                 .stream()
                 .map(this::toDietPlanResponse)
                 .toList();
+    }
+
+    public List<DietPlanDetailServiceResponse> getMyDietPlanDetails(Long currentUserId) {
+
+        List<DietPlanDetailServiceResponse> result = new ArrayList<>();
+        List<DietPlanServiceResponse> myDietPlans = getMyDietPlans(currentUserId);
+
+        for (DietPlanServiceResponse dietPlan : myDietPlans) {
+            List<DailyDietDetailResponse> dailyDietDetails = getDailyDietDetails(dietPlan);
+
+            DietPlanDetailServiceResponse dietPlanDetail = DietPlanDetailServiceResponse.builder()
+                    .dietPlanId(dietPlan.getDietPlanId())
+                    .authorId(dietPlan.getAuthorId())
+                    .title(dietPlan.getTitle())
+                    .content(dietPlan.getContent())
+                    .isPrimary(dietPlan.isPrimary())
+                    .startDate(dietPlan.getStartDate())
+                    .endDate(dietPlan.getEndDate())
+                    .dailyDiets(dailyDietDetails)
+                    .build();
+
+            result.add(dietPlanDetail);
+        }
+
+        return result;
     }
 
     public DietPlanServiceResponse getDietPlanById(Long dietPlanId) {
@@ -237,6 +270,16 @@ public class DietPlanService {
         }
 
         return copyDietPlanId;
+    }
+
+    private List<DailyDietDetailResponse> getDailyDietDetails(DietPlanServiceResponse dietPlan) {
+        LocalDate startDate =  dietPlan.getStartDate();
+
+        long duration = java.time.temporal.ChronoUnit.DAYS.between(dietPlan.getStartDate(), dietPlan.getEndDate()) + 1;
+        return Stream.iterate(startDate, date -> date.plusDays(1))
+                .limit(duration)
+                .map(date -> dailyDietService.getDailyDietDetailByDietPlan(DailyDietDetailServiceRequest.builder().dietPlanId(dietPlan.getDietPlanId()).date(date).build()))
+                .toList();
     }
 
     private void validateUser(Long currentUserId, Long userId) {
