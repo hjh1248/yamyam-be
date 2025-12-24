@@ -16,13 +16,13 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class ChatService {
 
     private final String promptTemplate = """
@@ -55,12 +55,18 @@ public class ChatService {
 
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
-
-
     private final DailyDietService dailyDietService;
     // Repository 주입
     private final BodySpecRepository bodySpecRepository;
     private final ChallengeRepository challengeRepository;
+
+    public ChatService(@Qualifier("openAiChatClient") ChatClient chatClient, VectorStore vectorStore, DailyDietService dailyDietService, BodySpecRepository bodySpecRepository, ChallengeRepository challengeRepository) {
+        this.chatClient = chatClient;
+        this.vectorStore = vectorStore;
+        this.dailyDietService = dailyDietService;
+        this.bodySpecRepository = bodySpecRepository;
+        this.challengeRepository = challengeRepository;
+    }
 
     public String request(Long userId, ChatRequest request) {
         // 1. [RAG] 벡터 DB 검색
