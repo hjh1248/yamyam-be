@@ -24,7 +24,7 @@
         FROM challenges c
                  JOIN challenge_participations cp ON c.id = cp.challenge_id
         WHERE cp.user_id = #{userId}
-          AND (cp.status = 'PROGRESS' OR cp.status = 'STOPPED') -- 포기한 것도 목록엔 보이게 하려면 포함
+          AND (cp.status = 'PROGRESS') -- 포기한 것도 목록엔 보이게 하려면 포함
     </select>
 
     <select id="findAvailableChallenges" resultType="com.ssafy.yamyam_coach.service.challenge.response.ChallengeResponse">
